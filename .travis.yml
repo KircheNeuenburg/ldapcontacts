@@ -1,0 +1,34 @@
+language: php
+php:
+  - 5.6
+  - 7
+
+env:
+  global:
+    - CORE_BRANCH=master
+    - APP_NAME=LdapContacts
+  matrix:
+    - DB=sqlite
+
+branches:
+  only:
+    - master
+    - /^stable\d+(\.\d+)?$/
+
+before_install:
+  - wget https://raw.githubusercontent.com/nextcloud/travis_ci/master/before_install.sh
+  - bash ./before_install.sh $APP_NAME $CORE_BRANCH $DB
+
+  # Add some output debugging information
+  - cd ../server
+  - ./occ app:enable $APP_NAME
+
+before_script:
+  - cd apps/$APP_NAME/
+
+script:
+  - cd tests
+  - phpunit --configuration phpunit.xml
+
+matrix:
+  fast_finish: true
