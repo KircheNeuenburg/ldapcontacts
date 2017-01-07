@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+<info>
+    <id>ldapcontacts</id>
+    <name>LDAP Contacts</name>
+    <description>Display your LDAP contacts</description>
+    <licence>AGPL</licence>
+    <author>Alexander Hornig</author>
+    <version>0.2</version>
+	<types>
+		<tool/>
+	</types>
+	<namespace>LdapContacts</namespace>
+	
+    <dependencies>
+        <user_ldap/>
+        <nextcloud min-version="10" max-version="11"/>
+    </dependencies>
+</info>
