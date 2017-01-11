@@ -9,18 +9,12 @@
  * @copyright Hornig Software 2016
  */
 
-
-// TODO(hornigal): make these settings editable through the administration panel	<=>		controller/contactcontroller.php:21
-// TODO(hornigal): catch ldap errors	<=>		controller/contactcontroller.php:39
-// TODO(hornigal): let the admin hide users
-
-
-
 namespace OCA\LdapContacts\AppInfo;
 
 use OCP\AppFramework\App;
 
-\OCP\App::registerAdmin("ldapcontacts", "admin");
+\OCP\App::registerAdmin('ldapcontacts', 'admin');
+\OCP\App::registerPersonal('ldapcontacts', 'personal');
 
 $app = new App('ldapcontacts');
 $container = $app->getContainer();

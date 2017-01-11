@@ -98,7 +98,7 @@ li.not-found > span {
 #navigation-header input[type="search"] {
 	width: 90%;
 	background: transparent url('../img/search.svg?v=1') no-repeat 5px center;
-	padding: 5px 5px 5px 25px;
+	padding: 5px 25px;
 	transition: width 0.5s;
 }
 

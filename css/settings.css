@@ -1,0 +1,111 @@
+#ldapcontacts .icon-loading {
+	min-height: 50px;
+}
+
+#ldapcontacts h3 {
+	display: inline;
+	margin-right: 10px;
+}
+
+#ldapcontacts .container{
+	margin-top: 10px;
+	padding: 5px;
+	border: 1px solid grey;
+	border-radius: 10px;
+}
+
+.edit-user, .edit-group {
+	display: inline-block;
+	margin: 5px;
+}
+
+.edit-user > *, .edit-group > * {
+	background-color: rgba(240, 240, 240, 0.9);
+	display: inline-block;
+	height: 23px;
+	padding: 1px 7px 0;
+}
+
+.edit-user > .name, .edit-group > .name {
+	display: inline-block;
+	border-right: 1px solid grey;
+	border-radius: 5px 0 0 5px;
+}
+
+.edit-user > .remove, .edit-group > .remove {
+	border-left: 1px solid grey;
+	font-weight: bold;
+	z-index: 10;
+	cursor: pointer;
+	border-radius: 0 5px 5px 0;
+}
+
+.edit-user > .remove:focus, .edit-user > .remove:hover, .edit-user > .remove:active,
+.edit-group > .remove:focus, .edit-group > .remove:hover, .edit-group > .remove:active {
+	background-color: rgba(201, 201, 201, 1);
+}
+
+/* search */
+#ldapcontacts .search-container {
+	position: relative;
+}
+
+#ldapcontacts span.search {
+	position: relative;
+}
+
+#ldapcontacts .search-suggestions {
+	display: inline-block;
+	position: absolute;
+	top: 32px;
+	left: 2px;
+}
+
+#ldapcontacts .search-suggestions > .suggestion {
+	z-index: 2;
+	cursor: pointer;
+	background-color: rgba(240, 240, 240, 1);
+	padding: 3px 10px;
+}
+
+#ldapcontacts .search-suggestions > .suggestion:focus, #ldapcontacts .search-suggestions > .suggestion:hover, #ldapcontacts .search-suggestions > .suggestion:active {
+	background-color: rgba(201, 201, 201, 1);
+}
+
+#ldapcontacts .search-suggestions > .suggestion:first-child {
+	
+}
+
+#ldapcontacts .search-suggestions > .suggestion:last-child {
+	border-radius: 0 0 4px 4px;
+}
+
+#ldapcontacts input[type="search"] {
+	background: transparent url('../img/search.svg?v=1') no-repeat 5px center;
+	padding: 5px 25px;
+	transition: width 0.5s;
+}
+
+#ldapcontacts input[type="search"] + .abort {
+	opacity: 0;
+	transition: opacity 0.5s;
+	background: transparent url('../img/remove.svg?v=1') no-repeat center;
+	background-size: 100%;
+	width: 0;
+	height: 20px;
+	position: absolute;
+	top: 18px;
+	right: 12px;
+}
+
+#ldapcontacts input[type="search"].searching + .abort {
+	opacity: 0.5;
+	width: 20px;
+	cursor: pointer;
+	margin-top: -20px;
+}
+
+#ldapcontacts input[type="search"].searching + .abort:hover, #ldapcontacts input[type="search"].searching + .abort:focus, #ldapcontacts input[type="search"].searching + .abort:active {
+	opacity: 0.8;
+}
+/* end of search */
