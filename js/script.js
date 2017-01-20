@@ -237,7 +237,6 @@ View.prototype = {
 	},
 	renderNavigationHeader: function () {
 		var self = this;
-		console.log( this._contacts._groups );
 		var source = $('#navigation-header-tpl').html();
         var template = Handlebars.compile(source);
         var html = template({"groups": this._contacts._groups});
