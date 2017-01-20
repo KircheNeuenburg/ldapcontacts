@@ -19,30 +19,32 @@ use OCP\AppFramework\Controller;
 
 class ContactController extends Controller {
 	// LDAP configuration
-	private $host;
-	private $port;
-	private $base_dn;
-	private $group_dn;
-	private $admin_dn;
-	private $admin_pwd;
-	private $user_filter;
-	private $user_filter_hidden;
-	private $user_filter_specific;
-	private $group_filter;
-	private $group_filter_hidden;
-	private $group_filter_specific;
-	private $ldap_version;
-	private $uname_property;
+	protected $host;
+	protected $port;
+	protected $base_dn;
+	protected $group_dn;
+	protected $admin_dn;
+	protected $admin_pwd;
+	protected $user_filter;
+	protected $user_filter_hidden;
+	protected $user_filter_specific;
+	protected $group_filter;
+	protected $group_filter_hidden;
+	protected $group_filter_specific;
+	protected $ldap_version;
+	protected $uname_property;
 	// ldap server connection
-	private $connection = false;
-	private $mail;
+	protected $connection = false;
+	protected $mail;
 	// other variables
-	private $l;
-	private $config;
-	private $uid;
-	private $AppName;
+	protected $l;
+	protected $config;
+	protected $uid;
+	protected $AppName;
 
-	public function __construct($AppName, IRequest $request, IConfig $config){
+	public function __construct( $AppName, IRequest $request, IConfig $config ) {
+		// check we have a logged in user
+		\OCP\User::checkLoggedIn();
 		parent::__construct($AppName, $request);
 		// load ldap configuration from the user_ldap app
 		$this->load_config();
@@ -187,7 +189,7 @@ class ContactController extends Controller {
 		unset( $results['count'] );
 		$return = array();
 		
-		$datas = explode( ',', 'mail,givenname,sn,street,postaladdress,postalcode,l,homephone,mobile,description,dn' );
+		$datas = explode( ',', 'mail,givenname,sn,street,postaladdress,postalcode,l,homephone,mobile,description,dn,uid' );
 		
 		$id = 1;
 		
@@ -251,7 +253,7 @@ class ContactController extends Controller {
 	 * 
 	 * @param $uid		the users uid
 	 */
-	private function get_user_groups( $uid ) {
+	protected function get_user_groups( $uid ) {
 		// get the users username
 		if( !$uname = $this->get_uname( $uid ) ) return false;
 		// construct the filter
@@ -291,7 +293,7 @@ class ContactController extends Controller {
 	/**
 	 * returns an array of the cn and dn of all existing groups
 	 */
-	private function get_groups( $group_filter ) {
+	protected function get_groups( $group_filter ) {
 		$request = ldap_list( $this->connection, $this->group_dn, $group_filter );
 		$entries = ldap_get_entries($this->connection, $request);
 		// check if request was successful and if so, remove the count variable
@@ -327,7 +329,7 @@ class ContactController extends Controller {
 	 * 
 	 * @param $uid		the users id
 	 */
-	private function get_uname( $uid ) {
+	protected function get_uname( $uid ) {
 		$request = ldap_search( $this->connection, $this->base_dn, str_replace( '%uid', $uid, $this->user_filter_specific ), array( $this->uname_property ) );
 		$entries = ldap_get_entries($this->connection, $request);
 		// check if request was successful
@@ -338,7 +340,7 @@ class ContactController extends Controller {
 	/**
 	 * get the users own dn
 	 */
-	private function get_own_dn() {
+	protected function get_own_dn() {
 		$user = $this->get_users( $this->user_filter, $this->mail, true );
 		// check if the user has been found
 		if( !isset( $user[0]['dn'] ) || empty( trim( $user[0]['dn'] ) ) ) return false;
@@ -382,8 +384,7 @@ class ContactController extends Controller {
 		// if the shadowAccount attribute is not given yet, add it
 		if( !$shadowGiven ) array_push( $results[0]['objectclass'], 'shadowAccount' );
 		// save the modified data
-		if( ldap_modify( $this->connection, $results[0]['dn'], array( 'objectclass' => $results[0]['objectclass'] ) ) ) return True;
-		else return False;
+		return ldap_modify( $this->connection, $results[0]['dn'], array( 'objectclass' => $results[0]['objectclass'] ) );
 	}
 	
 	/**
@@ -415,9 +416,11 @@ class ContactController extends Controller {
 		foreach( $results[0]['objectclass'] as $i => $class ) {
 			if( $class == "shadowAccount" ) unset( $results[0]['objectclass'][ $i ] );
 		}
+		
+		// reorder array
+		$objectclass = array_values( $results[0]['objectclass'] );
 		// save the modified data
-		if( ldap_modify( $this->connection, $results[0]['dn'], array( 'objectclass' => $results[0]['objectclass'] ) ) ) return True;
-		else return False;
+		return ldap_modify( $this->connection, $results[0]['dn'], array( 'objectclass' => $objectclass ) );
 	}
 	
 	/**
@@ -468,13 +471,11 @@ class ContactController extends Controller {
 		// if no uid is set yet, we have to add one
 		if( !isset( $results[0]['uid'] ) ) {
 			$uid = 'group' . strtolower( preg_replace('/\s+/', '', $results[0]['cn'][0]) );		// TODO(hornigal): add numbers in the back, if this isn't unique
-			if( ldap_modify( $this->connection, $results[0]['dn'], array( 'objectclass' => $results[0]['objectclass'], 'uid' => $uid ) ) ) return True;
-			else return False;
+			return ldap_modify( $this->connection, $results[0]['dn'], array( 'objectclass' => $results[0]['objectclass'], 'uid' => $uid ) );
 		}
 		
 		// save the modified data
-		if( ldap_modify( $this->connection, $results[0]['dn'], array( 'objectclass' => $results[0]['objectclass'] ) ) ) return True;
-		else return False;
+		return ldap_modify( $this->connection, $results[0]['dn'], array( 'objectclass' => $results[0]['objectclass'] ) );
 	}
 	
 	/**
@@ -505,8 +506,7 @@ class ContactController extends Controller {
 			if( $class == "shadowAccount" ) unset( $results[0]['objectclass'][ $i ] );
 		}
 		// save the modified data
-		if( ldap_modify( $this->connection, $results[0]['dn'], array( 'objectclass' => $results[0]['objectclass'], 'uid' => array() ) ) ) return True;
-		else return False;
+		return ldap_modify( $this->connection, $results[0]['dn'], array( 'objectclass' => $results[0]['objectclass'], 'uid' => array() ) );
 	}
 	
 	/**
