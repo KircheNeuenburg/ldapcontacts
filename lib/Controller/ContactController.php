@@ -6,7 +6,7 @@
  * later. See the COPYING file.
  *
  * @author Alexander Hornig <alexander@hornig-software.com>
- * @copyright Alexander Hornig 2016
+ * @copyright Alexander Hornig 2017
  */
 
 namespace OCA\LdapContacts\Controller;
