@@ -6,7 +6,7 @@
  * later. See the COPYING file.
  *
  * @author Alexander Hornig <alexander@hornig-software.com>
- * @copyright Alexander Hornig 2016
+ * @copyright Alexander Hornig 2017
  */
 
 /**
@@ -19,21 +19,21 @@
  */
 
 /** @var $this \OCP\Route\IRouter */
-$this->create('ldapcontacts_ajax_save_settings', 'ajax/save_settings.php')->actionInclude('ldapcontacts/ajax/save_settings.php');
+$this->create( 'ldapcontacts_ajax_save_settings', 'ajax/save_settings.php' )->actionInclude( 'ldapcontacts/ajax/save_settings.php' );
 
 return [
     'routes' => [
-	   ['name' => 'contact#index', 'url' => '/', 'verb' => 'GET'],
-	   ['name' => 'contact#load', 'url' => '/contacts', 'verb' => 'GET'],
-	   ['name' => 'contact#show', 'url' => '/contacts/own', 'verb' => 'GET'],
-	   ['name' => 'contact#update', 'url' => '/contacts/own', 'verb' => 'POST'],
-	   ['name' => 'contact#groups', 'url' => '/contacts/groups', 'verb' => 'GET'],
-	   ['name' => 'contact#admin_show_user', 'url' => '/contacts/admin/show/{uid}', 'verb' => 'GET'],
-	   ['name' => 'contact#admin_hide_user', 'url' => '/contacts/admin/hide/{uid}', 'verb' => 'GET'],
-	   ['name' => 'contact#adminGetUsersHidden', 'url' => '/contacts/admin', 'verb' => 'GET'],
-	   ['name' => 'contact#adminShowGroup', 'url' => '/contacts/admin/group/show/{gid}', 'verb' => 'GET'],
-	   ['name' => 'contact#adminHideGroup', 'url' => '/contacts/admin/group/hide/{gid}', 'verb' => 'GET'],
-	   ['name' => 'contact#adminGetGroupsHidden', 'url' => '/contacts/admin/group', 'verb' => 'GET'],
-	   ['name' => 'usersettings#saveSettings', 'url' => '/settings/personal', 'verb' => 'POST']
+	   [ 'name' => 'contact#index', 'url' => '/', 'verb' => 'GET' ],
+	   [ 'name' => 'contact#load', 'url' => '/contacts', 'verb' => 'GET' ],
+	   [ 'name' => 'contact#show', 'url' => '/contacts/own', 'verb' => 'GET' ],
+	   [ 'name' => 'contact#update', 'url' => '/contacts/own', 'verb' => 'POST' ],
+	   [ 'name' => 'contact#groups', 'url' => '/contacts/groups', 'verb' => 'GET' ],
+	   [ 'name' => 'contact#admin_show_user', 'url' => '/contacts/admin/show/{uid}', 'verb' => 'GET' ],
+	   [ 'name' => 'contact#admin_hide_user', 'url' => '/contacts/admin/hide/{uid}', 'verb' => 'GET' ],
+	   [ 'name' => 'contact#adminGetUsersHidden', 'url' => '/contacts/admin', 'verb' => 'GET' ],
+	   [ 'name' => 'contact#adminShowGroup', 'url' => '/contacts/admin/group/show/{gid}', 'verb' => 'GET' ],
+	   [ 'name' => 'contact#adminHideGroup', 'url' => '/contacts/admin/group/hide/{gid}', 'verb' => 'GET' ],
+	   [ 'name' => 'contact#adminGetGroupsHidden', 'url' => '/contacts/admin/group', 'verb' => 'GET' ],
+	   [ 'name' => 'usersettings#saveSettings', 'url' => '/settings/personal', 'verb' => 'POST' ]
     ]
 ];
