@@ -59,6 +59,7 @@
 	position: absolute;
 	top: 32px;
 	left: 2px;
+	z-index: 2;
 }
 
 #ldapcontacts .search-suggestions > .suggestion {
