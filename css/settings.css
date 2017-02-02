@@ -14,6 +14,11 @@
 	border-radius: 10px;
 }
 
+#ldapcontacts input[type="text"], #ldapcontacts input[type="url"], #ldapcontacts input[type="email"], #ldapcontacts textarea {
+	width: 100%;
+}
+
+
 .edit-user, .edit-group {
 	display: inline-block;
 	margin: 5px;

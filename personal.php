@@ -2,9 +2,9 @@
 use OCP\AppFramework\Http\TemplateResponse;
 
 // user settings
-$app = new \OCA\LdapContacts\Application();
-
+$app = new \OCA\LdapContacts\AppInfo\Application();
 $settings = $app->getContainer()->query('UserSettingsController');
+
 $property['order_by'] = $settings->getUserValue( 'order_by' );
 // generate template
 $tmpl = new TemplateResponse( 'ldapcontacts', 'settings-personal', $property, '' );

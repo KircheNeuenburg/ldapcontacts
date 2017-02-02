@@ -31,31 +31,9 @@ class Application extends App {
 	 */
 	private function registerServices() {
         $container = $this->getContainer();
-		
-        $container->registerService( 'ContactController', function($c) {
-            return new UserSettingsController(
-				$c->query( 'AppName' ),
-				$c->query( 'Request' ),
-				$c->query( 'Config' )
-			);
-        });
-		
-        $container->registerService( 'UserSettingsController', function($c) {
-            return new UserSettingsController(
-				$c->query( 'AppName' ),
-				$c->query( 'Request' ),
-				$c->query( 'Config' )
-			);
-        });
-		
-		$container->registerService( 'Admin', function($c) {
-            return new Admin(
-                $c->query( 'AppName' ),
-                $c->query( 'Request' ),
-                $c->query( 'Config' ),
-				$c->query( 'SettingsController' )
-            );
-        });
+		$container->registerAlias( 'ContactController', ContactController::class);
+		$container->registerAlias( 'UserSettingsController', UserSettingsController::class);
+		$container->registerAlias( 'Admin', Admin::class);
     }
 	
 	/**
