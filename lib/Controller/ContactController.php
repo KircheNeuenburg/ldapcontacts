@@ -56,9 +56,11 @@ class ContactController extends Controller {
 		$this->uid = \OC::$server->getUserSession()->getUser()->getUID();
 		// connect to the ldap server
 		$this->connection = ldap_connect( $this->host, $this->port );
+		
 		// TODO(hornigal): catch ldap errors
 		ldap_set_option( $this->connection, LDAP_OPT_PROTOCOL_VERSION, $this->ldap_version);
 		ldap_bind( $this->connection, $this->admin_dn, $this->admin_pwd );
+		
 		$this->mail = \OC::$server->getUserSession()->getUser()->getEMailAddress();
 		// load translation files
 		$this->l = \OC::$server->getL10N( 'ldapcontacts' );
@@ -74,6 +76,12 @@ class ContactController extends Controller {
 		$ldapWrapper = new \OCA\User_LDAP\LDAP();
 		$connection = new \OCA\User_LDAP\Connection( $ldapWrapper );
 		$config = $connection->getConfiguration();
+		// check if this is the correct server of if we have to use a prefix
+		if( empty( $config['ldap_host'] ) ) {
+			$connection = new \OCA\User_LDAP\Connection( $ldapWrapper, 's01' );
+			$config = $connection->getConfiguration();
+		}
+		
 		// put the needed configuration in the local variables
 		$this->host = $config['ldap_host'];
 		$this->port = $config['ldap_port'];
@@ -263,7 +271,7 @@ class ContactController extends Controller {
 		$entries = ldap_get_entries($this->connection, $result);
 		
 		// check if request was successful and if so, remove the count variable
-		if( $entries['count'] < 1 ) return false;
+		if( $entries['count'] < 1 ) return array();
 		array_shift( $entries );
 		
 		// output buffer
@@ -297,7 +305,7 @@ class ContactController extends Controller {
 		$request = ldap_list( $this->connection, $this->group_dn, $group_filter );
 		$entries = ldap_get_entries($this->connection, $request);
 		// check if request was successful and if so, remove the count variable
-		if( $entries['count'] < 1 ) return false;
+		if( $entries['count'] < 1 ) return array();
 		array_shift( $entries );
 		
 		// output buffer

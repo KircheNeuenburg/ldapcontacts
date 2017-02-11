@@ -1,5 +1,5 @@
 OC.L10N.register(
-    "contacts",
+    "ldapcontacts",
     {
 	"LDAP Contacts" : "LDAP Kontakte",
 	"Display your LDAP contacts" : "Stelle deine LDAP Kontakte dar",
