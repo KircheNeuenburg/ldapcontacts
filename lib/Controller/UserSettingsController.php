@@ -24,7 +24,8 @@ class UserSettingsController extends Controller {
 	private $l;
 	// default values
 	private $default = array(
-		'order_by' => 'firstname'
+		'order_by' => 'firstname',
+		'tutorial_state' => 0,
 	);
 
 	/**

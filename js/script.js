@@ -338,6 +338,111 @@ View.prototype = {
     }
 };
 
+
+
+
+var Tutorial = function () {
+	this._baseUrl = OC.generateUrl( '/apps/ldapcontacts' );
+	this._state = 0;
+	this._max_state = 3;
+	this._parents = [
+		"#navigation-header > ul",
+		"#navigation-header > ul",
+		"#app-navigation > div.info > ul",
+		"#app-settings",
+	];
+};
+
+Tutorial.prototype = {
+	// get the users current state
+	getState: function() {
+        var deferred = $.Deferred();
+        var self = this;
+		
+		// send request for the users setting
+		$.get( this._baseUrl + '/settings/personal/tutorial_state' ).done( function( state ) {
+			// check if the value is valid
+			if( Math.floor( state ) != state || !$.isNumeric( state ) ) state = 0;
+			// set the users state
+			self._state = state;
+			return deferred.resolve();
+		}).fail( function(data) {
+            deferred.reject();
+        });
+		return deferred.promise();
+	},
+	// gets the message for the current tutorial
+	getMessage: function() {
+		return $( $( '#tutorial-translations' ).children( 'p' )[ this._state ] ).text();
+	},
+	// gets the parent element for the current tutorial to be placed in
+	getTutorialParent: function() {
+		return $( this._parents[ this._state ] );
+	},
+	// 
+	doCustomAction: function() {
+		switch( this._state ) {
+			case 0:
+				if( $( document ).width() < 769 )
+					$( '#app-content' ).css( 'transform', 'translate3d(250px, 0px, 0px)' );
+				break;
+			case 1:
+				if( $( document ).width() < 769 )
+					$( '#app-content' ).css( 'transform', 'translate3d(250px, 0px, 0px)' );
+				break;
+		}
+	},
+	// show the next tutorial step and hide the current one
+    next: function() {
+		var self = this;
+		// remove the current tutorial
+		$( '#tutorial-container' ).remove();
+		
+		// save the current tutorial state
+		this.saveState();
+		// check if the user is already up to date with this tutorials
+		if( this._state > this._max_state ) return;
+		
+		// render new tutorial
+		var self = this;
+        var source = $( '#tutorial-tpl' ).html();
+        var template = Handlebars.compile( source );
+        var html = template( { message: this.getMessage() } );
+        this.getTutorialParent().append( html );
+		// add custom attribute
+		$( '#tutorial-container' ).attr( "tutorial-id", this._state ).slideDown( 300 );
+		// do custom action
+		this.doCustomAction();
+		
+		// increase state count
+		this._state++;
+		
+		// add action for going to the next tutorial
+		$( '#tutorial-next' ).one( 'click', function() {
+			self.next();
+		});
+	},
+	// when the user finished the current tutorial, save his tutorial status
+	saveState: function() {
+		var settings = new Object();
+		settings.key = 'tutorial_state';
+		settings.value = this._state;
+		
+		// save the state
+		return $.ajax({
+            url: this._baseUrl + '/settings/personal',
+            method: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify( settings )
+        });
+	},
+};
+
+
+
+
+var tutorial = new Tutorial();
+
 var contacts = new Contacts(OC.generateUrl('/apps/ldapcontacts/contacts'));
 var view = new View(contacts);
 contacts.loadAll().done(function () {
@@ -347,6 +452,11 @@ contacts.loadAll().done(function () {
 			view.render();
 			view.renderSettings();
 			view.renderNavigationHeader();
+			// load the tutorial
+			tutorial.getState().done( function() {
+				// show the first tutorial text
+				tutorial.next();
+			});
 		});
 	});
 }).fail(function () {

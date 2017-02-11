@@ -1,0 +1,113 @@
+#tutorial-container {
+	white-space: nowrap;
+    position: absolute;
+	z-index: 9999;
+	background-color: #fff;
+	padding: 7px 12px;
+	background: #ccf0ff;
+	border: 3px solid #69abf5;
+	border-radius: 5px;
+}
+#tutorial-container:after, #tutorial-container:before {
+	right: 100%;
+	border: solid transparent;
+	content: " ";
+	height: 0;
+	width: 0;
+	position: absolute;
+	pointer-events: none;
+}
+
+#tutorial-container:after {
+	border-color: rgba(204, 240, 255, 0);
+	border-right-color: #ccf0ff;
+}
+#tutorial-container:before {
+	border-color: rgba(105, 171, 245, 0);
+	border-right-color: #69abf5;
+}
+
+/*** tutorial specifi styles ***/
+/* 0 */
+	#tutorial-container[tutorial-id="0"] {
+		top: -6px;
+		left: 100%;
+		margin-left: 5px;
+	}
+	
+	#tutorial-container[tutorial-id="0"]:after, #tutorial-container[tutorial-id="0"]:before {
+		top: 23px;
+	}
+
+	#tutorial-container[tutorial-id="0"]:after {
+		border-width: 16px;
+		margin-top: -16.5px;
+	}
+
+	#tutorial-container[tutorial-id="0"]:before {
+		border-width: 21px;
+		margin-top: -21px;
+	}
+
+/* 1 */
+	#tutorial-container[tutorial-id="1"] {
+		top: 28px;
+		left: 100%;
+		margin-left: 5px;
+	}
+	
+	#tutorial-container[tutorial-id="1"]:after, #tutorial-container[tutorial-id="1"]:before {
+		top: 23px;
+	}
+
+	#tutorial-container[tutorial-id="1"]:after {
+		border-width: 16px;
+		margin-top: -16.5px;
+	}
+
+	#tutorial-container[tutorial-id="1"]:before {
+		border-width: 21px;
+		margin-top: -21px;
+	}
+
+/* 2 */
+	#tutorial-container[tutorial-id="2"] {
+		top: 95px;
+		left: 100%;
+		margin-left: -10px;
+	}
+	
+	#tutorial-container[tutorial-id="2"]:after, #tutorial-container[tutorial-id="2"]:before {
+		top: 23px;
+	}
+
+	#tutorial-container[tutorial-id="2"]:after {
+		border-width: 16px;
+		margin-top: -16.5px;
+	}
+
+	#tutorial-container[tutorial-id="2"]:before {
+		border-width: 21px;
+		margin-top: -21px;
+	}
+
+/* 3 */
+	#tutorial-container[tutorial-id="3"] {
+		bottom: 0;
+		left: 100%;
+		margin-left: -10px;
+	}
+	
+	#tutorial-container[tutorial-id="3"]:after, #tutorial-container[tutorial-id="3"]:before {
+		bottom: 23px;
+	}
+
+	#tutorial-container[tutorial-id="3"]:after {
+		border-width: 16px;
+		margin-bottom: -16.5px;
+	}
+
+	#tutorial-container[tutorial-id="3"]:before {
+		border-width: 21px;
+		margin-bottom: -21px;
+	}

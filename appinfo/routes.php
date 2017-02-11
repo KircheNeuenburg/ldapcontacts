@@ -34,6 +34,7 @@ return [
 	   [ 'name' => 'contact#adminShowGroup', 'url' => '/contacts/admin/group/show/{gid}', 'verb' => 'GET' ],
 	   [ 'name' => 'contact#adminHideGroup', 'url' => '/contacts/admin/group/hide/{gid}', 'verb' => 'GET' ],
 	   [ 'name' => 'contact#adminGetGroupsHidden', 'url' => '/contacts/admin/group', 'verb' => 'GET' ],
-	   [ 'name' => 'userSettings#saveSettings', 'url' => '/settings/personal', 'verb' => 'POST' ]
+	   [ 'name' => 'userSettings#saveSettings', 'url' => '/settings/personal', 'verb' => 'POST' ],
+	   [ 'name' => 'userSettings#getUserValue', 'url' => '/settings/personal/{key}', 'verb' => 'GET' ],
     ]
 ];
