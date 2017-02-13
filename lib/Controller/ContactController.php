@@ -128,6 +128,9 @@ class ContactController extends Controller {
 	* @NoAdminRequired
 	*/
 	public function show() {
+		// check this user actually has an email
+		if( empty( $this->mail ) ) return new DataResponse( false );
+		// get the users info
 		return new DataResponse( $this->get_users( $this->user_filter , $this->mail ) );
 	}
 	
@@ -349,6 +352,9 @@ class ContactController extends Controller {
 	 * get the users own dn
 	 */
 	protected function get_own_dn() {
+		// check this user actually has an email
+		if( empty( $this->mail ) ) return false;
+		
 		$user = $this->get_users( $this->user_filter, $this->mail, true );
 		// check if the user has been found
 		if( !isset( $user[0]['dn'] ) || empty( trim( $user[0]['dn'] ) ) ) return false;
