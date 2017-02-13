@@ -48,6 +48,10 @@ OC.L10N.register(
 	"Making group visible failed" : "Gruppe sichtbar machen fehlgeschlagen",
 	"Firstname" : "Vorname",
 	"Lastname" : "Nachname",
-	"Order Contacts by:" : "Kontakte sortieren nach:"
+	"Order Contacts by:" : "Kontakte sortieren nach:",
+	"Got it" : "Alles Klar",
+	"Search all contacts" : "Durchsuche alle vorhandenen Kontakte",
+	"Here you can restrict your search to members of a certain group" : "Hier kannst du die Suche auf Mitglieder einer bestimmte Gruppe beschränken",
+	"Down here you can edit your own data" : "Hier unten kannst du deine eigenen Daten bearbeiten"
 },
 "nplurals=2; plural=(n != 1);");

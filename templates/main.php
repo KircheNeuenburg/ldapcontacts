@@ -3,21 +3,24 @@
 script('ldapcontacts', 'script');
 // styles
 style('ldapcontacts', 'style');
+style('ldapcontacts', 'tutorial');
 // available data
 $data = array( 'mail' => 'Mail', 'givenname' => 'First Name', 'sn' => 'Last Name', 'street' => 'Street', 'postaladdress' => 'House number', 'postalcode' => 'zip Code', 'l' => 'City', 'homephone' => 'Phone', 'mobile' => 'Mobile', 'description' => 'About me' );
 ?>
 <div id="app">
 	<div id="app-navigation">
 		<script id="navigation-header-tpl" type="text/x-handlebars-template">
-			<li><span><input type="search" id="search_ldap_contacts"><span class="abort"></span></span></li>
-			<li><select id="ldap_contacts_group_selector">
-				<option value="all"><?php p($l->t( "All" ) ); ?></option>
-				{{#each groups}}
-					<option value="{{ id }}">{{ cn }}</option>
-				{{/each}}
-			</select></li>
+			<ul>
+				<li><span><input type="search" id="search_ldap_contacts"><span class="abort"></span></span></li>
+				<li><select id="ldap_contacts_group_selector">
+					<option value="all"><?php p($l->t( "All" ) ); ?></option>
+					{{#each groups}}
+						<option value="{{ id }}">{{ cn }}</option>
+					{{/each}}
+				</select></li>
+			</ul>
 		</script>
-		<ul id="navigation-header"><div class="icon-loading centered"></div></ul>
+		<div id="navigation-header"><div class="icon-loading centered"></div></div>
 		
 		
 		<script id="navigation-tpl" type="text/x-handlebars-template">
@@ -109,4 +112,22 @@ $data = array( 'mail' => 'Mail', 'givenname' => 'First Name', 'sn' => 'Last Name
 		</script>
 		<div id="info"><div class="icon-loading centered"></div></div>
 	</div>
+</div>
+
+<script id="tutorial-tpl" type="text/x-handlebars-template">
+	<div id="tutorial-container" style="display: none">
+		<div class="body">
+			{{ message }}
+		</div>
+		<div class="footer">
+			<button id="tutorial-next"><?php p($l->t( 'Got it' )); ?></button>
+		</div>
+	</div>
+</script>
+
+<div id="tutorial-translations" style="display: none">
+	<p><?php p($l->t( 'Search all contacts' )); ?></p>
+	<p><?php p($l->t( 'Here you can restrict your search to members of a certain group' )); ?></p>
+	<p><?php p($l->t( 'Select a contact from the list to view details' )); ?></p>
+	<p><?php p($l->t( 'Down here you can edit your own data' )); ?></p>
 </div>
