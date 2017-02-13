@@ -51,6 +51,8 @@ class UserSettingsController extends Controller {
 	 * @NoAdminRequired
 	 */
 	public function getUserValue( $key ) {
+		// check if this is a valid setting
+		if( !isset( $this->default[ $key ] ) ) return false;
 		return $this->config->getUserValue( $this->uid, $this->appName, $key, $this->default[ $key ] );
 	}
 	
@@ -59,8 +61,11 @@ class UserSettingsController extends Controller {
 	 * 
 	 * @param string $key
 	 * @param string $value
+	 * @NoAdminRequired
 	 */
 	private function setUserValue( $key, $value ) {
+		// check if this is a valid setting
+		if( !isset( $this->default[ $key ] ) ) return false;
 		return $this->config->setUserValue( $this->uid, $this->appName, $key, $value );
 	}
 	
@@ -72,7 +77,7 @@ class UserSettingsController extends Controller {
 	 * @NoAdminRequired
 	 */
 	public function saveSettings( $key, $value ) {
-		if( !$this->setUserValue( $key, $value ) ) return new DataResponse( array( 'data' => array( 'message' => $this->l->t( 'Settings saved' ) ), 'status' => 'success' ) );
+		if( isset( $this->default[ $key ] ) && !$this->setUserValue( $key, $value ) ) return new DataResponse( array( 'data' => array( 'message' => $this->l->t( 'Settings saved' ) ), 'status' => 'success' ) );
 		else return new DataResponse( array( 'data' => array( 'message' => $this->l->t( 'Something went wrong while saving the settings. Please try again.' ) ), 'status' => 'error' ) );
 	}
 }

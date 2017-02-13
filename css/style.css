@@ -42,6 +42,11 @@
 	z-index: 1;
 }
 
+#navigation-header > #add-group {
+	position: relative;
+	z-index: 1;
+}
+
 #app-navigation > #navigation-header > ul{
 	position: relative;
 	z-index: 1;
@@ -77,18 +82,6 @@ li.not-found > span {
 	text-overflow: ellipsis;
 	color: #000;
 	opacity: .57;
-}
-
-#navigation-header > .icon-loading {
-	height: 60px;
-}
-
-#navigation-header > li {
-	text-align: center;
-}
-
-#navigation-header > li > * {
-	margin: 0;
 }
 
 #app-settings {
