@@ -13,6 +13,7 @@ namespace OCA\LdapContacts\Controller;
 
 use OCP\IRequest;
 use OCP\IConfig;
+use \OCP\IUserManager;
 use OCP\AppFramework\Http\TemplateResponse;
 use OCP\AppFramework\Http\DataResponse;
 use OCP\AppFramework\Controller;
@@ -42,7 +43,7 @@ class ContactController extends Controller {
 	protected $uid;
 	protected $AppName;
 
-	public function __construct( $AppName, IRequest $request, IConfig $config ) {
+	public function __construct( $AppName, IRequest $request, IConfig $config, $UserId ) {
 		// check we have a logged in user
 		\OCP\User::checkLoggedIn();
 		parent::__construct($AppName, $request);
@@ -53,7 +54,7 @@ class ContactController extends Controller {
 		// save the apps name
 		$this->AppName = $AppName;
 		// get the current users id
-		$this->uid = \OC::$server->getUserSession()->getUser()->getUID();
+		$this->mail = $this->uid = $UserId;
 		// connect to the ldap server
 		$this->connection = ldap_connect( $this->host, $this->port );
 		
@@ -61,7 +62,6 @@ class ContactController extends Controller {
 		ldap_set_option( $this->connection, LDAP_OPT_PROTOCOL_VERSION, $this->ldap_version);
 		ldap_bind( $this->connection, $this->admin_dn, $this->admin_pwd );
 		
-		$this->mail = \OC::$server->getUserSession()->getUser()->getEMailAddress();
 		// load translation files
 		$this->l = \OC::$server->getL10N( 'ldapcontacts' );
 	}
