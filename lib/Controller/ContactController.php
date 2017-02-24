@@ -54,7 +54,7 @@ class ContactController extends Controller {
 		// save the apps name
 		$this->AppName = $AppName;
 		// get the current users id
-		$this->mail = $this->uid = $UserId;
+		$this->uid = $UserId;
 		// connect to the ldap server
 		$this->connection = ldap_connect( $this->host, $this->port );
 		
@@ -62,6 +62,8 @@ class ContactController extends Controller {
 		ldap_set_option( $this->connection, LDAP_OPT_PROTOCOL_VERSION, $this->ldap_version);
 		ldap_bind( $this->connection, $this->admin_dn, $this->admin_pwd );
 		
+		// load the users email adress
+		$this->mail = \OC::$server->getUserSession()->getUser()->getEMailAddress();
 		// load translation files
 		$this->l = \OC::$server->getL10N( 'ldapcontacts' );
 	}
