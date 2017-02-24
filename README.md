@@ -10,4 +10,5 @@ View other LDAP users as contacts in Nextcloud and see the personal data they sh
 
 ### Requirements
   * active LDAP authentification (check [Nextcloud admin manual](https://docs.nextcloud.com/server/11/admin_manual/configuration_user/user_auth_ldap.html) for details)
+  * under "Administration > LDAP / AD Integration > Advanced > Special Properties" you need to specify the E-Mail Property
   * Only tested on Nextcloud 11
