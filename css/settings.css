@@ -90,6 +90,7 @@
 	background: transparent url('../img/search.svg?v=1') no-repeat 5px center;
 	padding: 5px 25px;
 	transition: width 0.5s;
+	min-width: 250px;
 }
 
 #ldapcontacts input[type="search"] + .abort {
@@ -115,3 +116,15 @@
 	opacity: 0.8;
 }
 /* end of search */
+
+#ldaporg-existing-users {
+	width: 30%;
+}
+
+#ldaporg-user-content {
+	width: 63%;
+}
+
+#LdapOrgSettings .button {
+	display: inline-block;
+}
