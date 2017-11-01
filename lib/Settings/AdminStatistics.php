@@ -14,19 +14,19 @@ namespace OCA\LdapContacts\Settings;
 use OCP\AppFramework\Http\TemplateResponse;
 use OCP\Settings\ISettings;
 
-Class Admin implements ISettings {
+Class AdminStatistics implements ISettings {
 	/**
 	 * @return TemplateResponse
 	 */
 	public function getForm() {
-		return new TemplateResponse( 'ldapcontacts', 'settings' );
+		return new TemplateResponse( 'ldapcontacts', 'statistics' );
 	}
 	
 	/**
 	 * @return string the section ID, e.g. 'sharing'
 	 */
 	public function getSection() {
-		return 'ldap';
+		return 'serverinfo';
 	}
 
 	/**

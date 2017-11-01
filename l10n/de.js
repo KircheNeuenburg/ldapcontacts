@@ -52,6 +52,15 @@ OC.L10N.register(
 	"Got it" : "Alles Klar",
 	"Search all contacts" : "Durchsuche alle vorhandenen Kontakte",
 	"Here you can restrict your search to members of a certain group" : "Hier kannst du die Suche auf Mitglieder einer bestimmte Gruppe beschränken",
-	"Down here you can edit your own data" : "Hier unten kannst du deine eigenen Daten bearbeiten"
+	"Down here you can edit your own data" : "Hier unten kannst du deine eigenen Daten bearbeiten",
+    "Entries" : "Einträge",
+    "Filled" : "Ausgefüllt",
+    "Empty" : "Leer",
+    "Users" : "Benutzer",
+    "Users with some filled entries" : "Benutzer mit ein paar ausgefüllten Einträgen",
+    "Users with only empty entries" : "Benutzer mit nur leeren Einträgen",
+    "Entries filled" : "Ausgefüllte Einträge",
+    "Users with filled entries" : "Benutzer mit ausgefüllten Einträgen",
+    "Total:" : "Gesamt:"
 },
 "nplurals=2; plural=(n != 1);");

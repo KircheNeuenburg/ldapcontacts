@@ -1,3 +1,6 @@
+(function (OC, window, $, undefined) {
+'use strict';
+
 $(document).ready(function(){
 	// save settings
 	$( "#ldapcontacts button[type='submit']" ).click( function ( event ) {
@@ -369,3 +372,4 @@ $(document).ready(function(){
 	// initial rendering
 	contacts.render();
 });
+})(OC, window, jQuery);

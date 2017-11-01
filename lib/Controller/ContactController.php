@@ -42,6 +42,9 @@ class ContactController extends Controller {
 	protected $config;
 	protected $uid;
 	protected $AppName;
+    // values
+    protected $contacts_available_attributes;
+    protected $contacts_default_attributes = [ 'mail', 'givenname', 'sn' ];
 
 	public function __construct( $AppName, IRequest $request, IConfig $config, $UserId ) {
 		// check we have a logged in user
@@ -66,6 +69,10 @@ class ContactController extends Controller {
 		$this->mail = \OC::$server->getUserSession()->getUser()->getEMailAddress();
 		// load translation files
 		$this->l = \OC::$server->getL10N( 'ldapcontacts' );
+        
+        
+        // define ldap attributes
+        $this->contacts_available_attributes = [ 'mail' => $this->l->t( 'Mail' ), 'givenname' => $this->l->t( 'First Name' ), 'sn' => $this->l->t( 'Last Name' ), 'street' => $this->l->t( 'Street' ), 'postaladdress' => $this->l->t( 'House number' ), 'postalcode' => $this->l->t( 'zip Code' ), 'l' => $this->l->t( 'City' ), 'homephone' => $this->l->t( 'Phone' ), 'mobile' => $this->l->t( 'Mobile' ), 'description' => $this->l->t( 'About me' ) ];
 	}
 	
 	/**
@@ -112,11 +119,7 @@ class ContactController extends Controller {
 	}
 
 	/**
-	 * CAUTION: the @Stuff turns off security checks; for this page no admin is
-	 *          required and no CSRF check. If you don't know what CSRF is, read
-	 *          it up in the docs or you might create a security hole. This is
-	 *          basically the only required method to add this exemption, don't
-	 *          add it to any other method if you don't exactly know what it does
+	 * get all users
 	 *
 	 * @NoAdminRequired
 	 */
@@ -193,7 +196,7 @@ class ContactController extends Controller {
 	 * @param string $uid
 	 * @param string $get_dn
 	 */
-	public function get_users( $user_filter, $uid = false, $get_dn = false ) {
+	protected function get_users( $user_filter, $uid = false, $get_dn = false ) {
 		if( $uid )
 			$request = ldap_search( $this->connection, $this->base_dn, str_replace( '%uid', $uid, $this->user_filter_specific ));
 		else
@@ -532,4 +535,209 @@ class ContactController extends Controller {
 	public function adminGetGroupsHidden() {
 		return new DataResponse( $this->get_groups( $this->group_filter_hidden ) );
 	}
+    
+    /**
+     * get all available statistics
+     */
+    public function getStatistics() {
+        // all available statistics
+        $statistics = [ 'entries', 'entries_filled', 'entries_empty', 'entries_filled_percent', 'entries_empty_percent', 'users', 'users_filled_entries', 'users_empty_entries', 'users_filled_entries_percent', 'users_empty_entries_percent' ];
+        
+        // get them all
+        $data = [ 'status' => 'success' ];
+        foreach( $statistics as $type ) {
+            // get the statistic
+            $stat = $this->getStatistic( $type )->getData();
+            // check if something went wrong
+            if( $stat['status'] != 'success' ) {
+                return new DataResponse( [ 'status' => 'error' ] );
+            }
+            // add the data to the bundle
+            $data[ $type ] = $stat['data'];
+        }
+        
+        // return collected statistics
+        return new DataResponse( $data );
+    }
+    
+    /**
+     * computes the wanted statistic
+     * 
+     * @param string $type      the type of statistic to be returned
+     */
+    public function getStatistic( $type ) {
+        switch( $type ) {
+            case 'entries':
+                $data = $this->entryAmount();
+                break;
+            case 'entries_filled':
+                $data = $this->entriesFilled();
+                break;
+            case 'entries_empty':
+                $data = $this->entriesEmpty();
+                break;
+            case 'entries_filled_percent':
+                $data = $this->entriesFilledPercent();
+                break;
+            case 'entries_empty_percent':
+                $data = $this->entriesEmptyPercent();
+                break;
+            case 'users':
+                $data = $this->userAmount();
+                break;
+            case 'users_filled_entries':
+                $data = $this->usersFilledEntries();
+                break;
+            case 'users_empty_entries':
+                $data = $this->usersEmtpyEntries();
+                break;
+            case 'users_filled_entries_percent':
+                $data = $this->usersFilledEntriesPercent();
+                break;
+            case 'users_empty_entries_percent':
+                $data = $this->usersEmptyEntriesPercent();
+                break;
+            default:
+                // no valid statistic given
+                return new DataResponse( [ 'status' => 'error' ] );
+        }
+        // return gathered data
+        return new DataResponse( [ 'data' => $data, 'status' => 'success' ] );
+    }
+    
+    /**
+     * get all user attributes that aren't filled from the start
+     */
+    protected function userNonDefaultAttributes() {
+        // get all user attributes
+        $attributes = $this->contacts_available_attributes;
+        // remove all defaults
+        foreach( $this->contacts_default_attributes as $key ) {
+            unset( $attributes[ $key ] );
+        }
+        // return non default attributes
+        return $attributes;
+    }
+    
+    /**
+     * amount of entries users can edit
+     */
+    protected function entryAmount() {
+        // get all attributes the users can edit
+        $attributes = $this->userNonDefaultAttributes();
+        // get all users and their data
+        $users = $this->get_users( $this->user_filter );
+        // init counter
+        $amount = 0;
+        
+        // count the entries
+        foreach( $users as $user ) {
+            foreach( $attributes as $attr ) {
+                $amount++;
+            }
+        }
+        
+        // return the counted amount
+        return $amount;
+    }
+    
+    /**
+     * amount of entries the users have filled out
+     */
+    protected function entriesFilled() {
+        // get all attributes the users can edit
+        $attributes = $this->userNonDefaultAttributes();
+        // get all users and their data
+        $users = $this->get_users( $this->user_filter );
+        // init counter
+        $amount = 0;
+        
+        // count the entries
+        foreach( $users as $user ) {
+            foreach( $attributes as $attr => $v ) {
+                // check if the entry is filled
+                if( !empty( $user[ $attr ] ) ) {
+                    $amount++;
+                }
+            }
+        }
+        
+        // return the counted amount
+        return $amount;
+    }
+    
+    /**
+     * amount of entries the users haven't filled out
+     */
+    protected function entriesEmpty() {
+        return $this->entryAmount() - $this->entriesFilled();
+    }
+    
+    /**
+     * amount of entries the users have filled out, in percent
+     */
+    protected function entriesFilledPercent() {
+        return round( $this->entriesFilled() / $this->entryAmount() * 100, 2 );
+    }
+    
+    /**
+     * amount of entries the users haven't filled out, in percent
+     */
+    protected function entriesEmptyPercent() {
+        return round( $this->entriesEmpty() / $this->entryAmount() * 100, 2 );
+    }
+    
+    /**
+     * amount of registered users
+     */
+    protected function userAmount() {
+        return count( $this->get_users( $this->user_filter ) );
+    }
+    
+    /**
+     * how many users have filled at least one of their entries
+     */
+    protected function usersFilledEntries() {
+        // get all attributes the users can edit
+        $attributes = $this->userNonDefaultAttributes();
+        // get all users and their data
+        $users = $this->get_users( $this->user_filter );
+        // init counter
+        $amount = 0;
+        
+        // count the entries
+        foreach( $users as $user ) {
+            foreach( $attributes as $attr => $v ) {
+                // check if the entry is filled
+                if( !empty( $user[ $attr ] ) ) {
+                    $amount++;
+                    break;
+                }
+            }
+        }
+        
+        // return the counted amount
+        return $amount;
+    }
+    
+    /**
+     * how many users have filled none of their entries
+     */
+    protected function usersEmtpyEntries() {
+        return $this->userAmount() - $this->usersFilledEntries();
+    }
+    
+    /**
+     * how many users have filled at least one of their entries, in percent
+     */
+    protected function usersFilledEntriesPercent() {
+        return round( $this->usersFilledEntries() / $this->userAmount() * 100, 2 );
+    }
+    
+    /**
+     * how many users have filled none of their entries, in percent
+     */
+    protected function usersEmptyEntriesPercent() {
+        return round( $this->usersEmtpyEntries() / $this->userAmount() * 100, 2 );
+    }
 }

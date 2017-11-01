@@ -1,0 +1,19 @@
+#ldapcontacts .icon-loading {
+	min-height: 50px;
+}
+
+#ldapcontacts .stat {
+    width: 49%;
+    display: inline-block;
+}
+
+#ldapcontacts .stat .total, #ldapcontacts .stat .title {
+    text-align: center;
+    font-weight: bold;
+}
+
+@media (max-width: 769px) {
+    #ldapcontacts .stat {
+        width: 100%;
+    }
+}
