@@ -163,15 +163,16 @@ class ContactController extends Controller {
 	public function update( $givenname, $sn, $street, $postaladdress, $postalcode, $l, $homephone, $mobile, $description ) {
 		// put all given values in one array
 		$datas = explode( ',', 'givenname,sn,street,postaladdress,postalcode,l,homephone,mobile,description' );
-		$modify = array();
+		$modify = [];
+		
 		foreach( $datas as $data ) {
 			$$data = trim( $$data );
-			// remove entrie if exists
+			// remove entry if exists
 			if( $$data == '' ) {
-				
+				$modify[ $data ] = [];
 			}
 			else {
-				// add or modify entires
+				// add or modify entries
 				$modify[ $data ] = $$data;
 			}
 		}
