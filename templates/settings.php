@@ -1,8 +1,8 @@
 <?php
 // javascript
-script( 'ldapcontacts', 'settings' );
+script( 'ldapcontacts', [ 'settings', 'statistics', 'Chart.min' ] );
 // style
-style( 'ldapcontacts', 'settings' );
+style( 'ldapcontacts', [ 'settings', 'statistics' ] );
 ?>
 <div id="ldapcontacts">
 	<div class="section">
@@ -76,5 +76,21 @@ style( 'ldapcontacts', 'settings' );
 		
 		<br><h3><?php p($l->t('Hidden Groups')); ?></h3><span id="ldapcontacts-edit-group-msg" class="msg"></span>
 		<div id="ldapcontacts-edit-group"><div class="icon-loading"></div></div>
+        
+        <h3><?php p($l->t( 'Statistics' )); ?></h3>
+    
+        <script id="ldapcontacts-stat-tpl" type="text/x-handlebars-template">
+            <div class="stat">
+                <h2 class="title">{{ title }}</h2>
+
+                <canvas id="{{ id }}"></canvas>
+
+                {{#if total}}
+                    <h3 class="total"><?php p($l->t( 'Total:' )); ?> {{ total }}</h3>
+                {{/if}}
+            </div>
+        </script>
+
+        <div id="ldapcontacts-stats"><div class="icon-loading"></div></div>
 	</div>
 </div>

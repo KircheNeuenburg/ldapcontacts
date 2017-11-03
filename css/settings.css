@@ -2,7 +2,7 @@
 	min-height: 50px;
 }
 
-#ldapcontacts h3 {
+#ldapcontacts h3:not(.total) {
 	display: inline;
 	margin-right: 10px;
 }

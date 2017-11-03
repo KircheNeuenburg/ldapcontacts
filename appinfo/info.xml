@@ -29,7 +29,6 @@
 	
 	<settings>
 		<admin>OCA\LdapContacts\Settings\Admin</admin>
-		<admin>OCA\LdapContacts\Settings\AdminStatistics</admin>
 		<personal>OCA\LdapContacts\Settings\Personal</personal>
 	</settings>
 </info>
