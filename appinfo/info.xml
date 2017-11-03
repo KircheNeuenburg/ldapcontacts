@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <info xmlns:xsi= "http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://apps.nextcloud.com/schema/apps/info.xsd">
     <id>ldapcontacts</id>
-    <name land="en">LDAP Contacts</name>
+    <name lang="en">LDAP Contacts</name>
     <description lang="en">Display your LDAP contacts</description>
     <version>1.0.0</version>
     <licence>AGPL</licence>
