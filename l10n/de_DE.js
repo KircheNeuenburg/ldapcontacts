@@ -61,6 +61,7 @@ OC.L10N.register(
     "Users with only empty entries" : "Benutzer mit nur leeren Einträgen",
     "Entries filled" : "Ausgefüllte Einträge",
     "Users with filled entries" : "Benutzer mit ausgefüllten Einträgen",
-    "Total:" : "Gesamt:"
+    "Total:" : "Gesamt:",
+    "Nothing to save" : "Nichts zu speicher"
 },
 "nplurals=2; plural=(n != 1);");

@@ -17,6 +17,7 @@ use \OCP\IUserManager;
 use OCP\AppFramework\Http\TemplateResponse;
 use OCP\AppFramework\Http\DataResponse;
 use OCP\AppFramework\Controller;
+use OCA\LdapContacts\Controller\SettingsController;
 
 class ContactController extends Controller {
 	// LDAP configuration
@@ -42,14 +43,24 @@ class ContactController extends Controller {
 	protected $config;
 	protected $uid;
 	protected $AppName;
+    protected $settings;
     // values
     protected $contacts_available_attributes;
     protected $contacts_default_attributes = [ 'mail', 'givenname', 'sn' ];
-
-	public function __construct( $AppName, IRequest $request, IConfig $config, $UserId ) {
+    
+    /**
+	 * @param string $AppName
+	 * @param IRequest $request
+	 * @param IConfig $config
+	 * @param SettingsController $settings
+     * @param mixed $UserId
+	 */
+	public function __construct( $AppName, IRequest $request, IConfig $config, SettingsController $settings, $UserId ) {
 		// check we have a logged in user
 		\OCP\User::checkLoggedIn();
-		parent::__construct($AppName, $request);
+		parent::__construct( $AppName, $request );
+        // get the settings controller
+        $this->settings = $settings;
 		// load ldap configuration from the user_ldap app
 		$this->load_config();
 		// get the config module for user settings
@@ -70,9 +81,8 @@ class ContactController extends Controller {
 		// load translation files
 		$this->l = \OC::$server->getL10N( 'ldapcontacts' );
         
-        
         // define ldap attributes
-        $this->contacts_available_attributes = [ 'mail' => $this->l->t( 'Mail' ), 'givenname' => $this->l->t( 'First Name' ), 'sn' => $this->l->t( 'Last Name' ), 'street' => $this->l->t( 'Street' ), 'postaladdress' => $this->l->t( 'House number' ), 'postalcode' => $this->l->t( 'zip Code' ), 'l' => $this->l->t( 'City' ), 'homephone' => $this->l->t( 'Phone' ), 'mobile' => $this->l->t( 'Mobile' ), 'description' => $this->l->t( 'About me' ) ];
+        $this->contacts_available_attributes = $this->settings->getSetting( 'user_ldap_attributes', false );
 	}
 	
 	/**
@@ -115,7 +125,18 @@ class ContactController extends Controller {
 	 * @NoCSRFRequired
 	 */
 	public function index() {
-		return new TemplateResponse( 'ldapcontacts', 'main' );
+        $params = [];
+        // get the users possible ldap attributes
+        if( $user_ldap_attributes = $this->settings->getSetting( 'user_ldap_attributes', false ) ) {
+            $params['user_ldap_attributes'] = $user_ldap_attributes;
+        }
+        // get the users login attribute
+        if( $login_attribute = $this->settings->getSetting( 'login_attribute', false ) ) {
+            $params['login_attribute'] = $login_attribute;
+        }
+        
+        // return the main template
+		return new TemplateResponse( 'ldapcontacts', 'main', $params );
 	}
 
 	/**
@@ -171,7 +192,7 @@ class ContactController extends Controller {
 		foreach( $datas as $data ) {
 			$$data = trim( $$data );
 			// remove entry if exists
-			if( $$data == '' ) {
+			if( $$data === '' ) {
 				$modify[ $data ] = [];
 			}
 			else {
@@ -225,7 +246,7 @@ class ContactController extends Controller {
 			// combine full name
 			$tmp['name'] = $tmp['givenname'] . ' ' . $tmp['sn'];
 			// a contact has to have a name
-			if( $tmp['name'] == ' ' ) continue;
+			if( $tmp['name'] === ' ' ) continue;
 			
 			// save the current id
 			$tmp['id'] = $id;
@@ -247,17 +268,17 @@ class ContactController extends Controller {
 		}
 		
 		// check if the users should be ordered by firstname or by lastname
-		if( $this->config->getUserValue( $this->uid, $this->AppName, 'order_by' ) == 'lastname' ) {
+		if( $this->config->getUserValue( $this->uid, $this->AppName, 'order_by' ) === 'lastname' ) {
 			// order the contacts by lastname
 			usort( $return, function( $a, $b ) {
-				if( $a['sn'] == $b['sn'] ) return $a['givenname'] <=> $b['givenname'];
+				if( $a['sn'] === $b['sn'] ) return $a['givenname'] <=> $b['givenname'];
 				else return $a['sn'] <=> $b['sn'];
 			});
 		}
 		else {
 			// order the contacts by firstname
 			usort( $return, function( $a, $b ) {
-				if( $a['givenname'] == $b['givenname'] ) return $a['sn'] <=> $b['sn'];
+				if( $a['givenname'] === $b['givenname'] ) return $a['sn'] <=> $b['sn'];
 				else return $a['givenname'] <=> $b['givenname'];
 			});
 		}
@@ -390,13 +411,13 @@ class ContactController extends Controller {
 		$request = ldap_search( $this->connection, $this->base_dn, str_replace( '%uid', $uid, $this->user_filter_specific ), array( 'objectClass' ) );
 		$results = ldap_get_entries( $this->connection, $request );
 		// check if something has been found
-		if( !isset( $results['count'], $results[0]['objectclass'], $results[0]['dn'] ) || $results['count'] != 1 ) return False;
+		if( !isset( $results['count'], $results[0]['objectclass'], $results[0]['dn'] ) || $results['count'] !== 1 ) return False;
 		// remove the count variable from the object class
 		unset( $results[0]['objectclass']['count'] );
 		$shadowGiven = false;
 		// go through every objectclass and check if it is the shadowAccount attribute is already there
 		foreach( $results[0]['objectclass'] as $i => $class ) {
-			if( $class == "shadowAccount" ) {
+			if( $class === "shadowAccount" ) {
 				$shadowGiven = true;
 				break;
 			}
@@ -429,12 +450,12 @@ class ContactController extends Controller {
 		$request = ldap_search( $this->connection, $this->base_dn, str_replace( '%uid', $uid, $this->user_filter_specific ), array( 'objectClass' ) );
 		$results = ldap_get_entries( $this->connection, $request );
 		// check if something has been found
-		if( !isset( $results['count'], $results[0]['objectclass'], $results[0]['dn'] ) || $results['count'] != 1 ) return False;
+		if( !isset( $results['count'], $results[0]['objectclass'], $results[0]['dn'] ) || $results['count'] !== 1 ) return False;
 		// remove the count variable from the object class
 		unset( $results[0]['objectclass']['count'] );
 		// go through every objectclass and check if it is the shadowAccount attribute we have to remove
 		foreach( $results[0]['objectclass'] as $i => $class ) {
-			if( $class == "shadowAccount" ) unset( $results[0]['objectclass'][ $i ] );
+			if( $class === "shadowAccount" ) unset( $results[0]['objectclass'][ $i ] );
 		}
 		
 		// reorder array
@@ -474,13 +495,13 @@ class ContactController extends Controller {
 		
 		
 		// check if something has been found
-		if( !isset( $results['count'], $results[0]['objectclass'], $results[0]['dn'], $results[0]['cn'][0] ) || $results['count'] != 1 ) return False;
+		if( !isset( $results['count'], $results[0]['objectclass'], $results[0]['dn'], $results[0]['cn'][0] ) || $results['count'] !== 1 ) return False;
 		// remove the count variable from the object class
 		unset( $results[0]['objectclass']['count'] );
 		$shadowGiven = false;
 		// go through every objectclass and check if it is the shadowAccount attribute is already there
 		foreach( $results[0]['objectclass'] as $i => $class ) {
-			if( $class == "shadowAccount" ) {
+			if( $class === "shadowAccount" ) {
 				$shadowGiven = true;
 				break;
 			}
@@ -518,12 +539,12 @@ class ContactController extends Controller {
 		$request = ldap_search( $this->connection, $this->group_dn, str_replace( '%gid', $gid, $this->group_filter_specific ), array( 'objectClass' ) );
 		$results = ldap_get_entries( $this->connection, $request );
 		// check if something has been found
-		if( !isset( $results['count'], $results[0]['objectclass'], $results[0]['dn'] ) || $results['count'] != 1 ) return False;
+		if( !isset( $results['count'], $results[0]['objectclass'], $results[0]['dn'] ) || $results['count'] !== 1 ) return False;
 		// remove the count variable from the object class
 		unset( $results[0]['objectclass']['count'] );
 		// go through every objectclass and check if it is the shadowAccount attribute we have to remove
 		foreach( $results[0]['objectclass'] as $i => $class ) {
-			if( $class == "shadowAccount" ) unset( $results[0]['objectclass'][ $i ] );
+			if( $class === "shadowAccount" ) unset( $results[0]['objectclass'][ $i ] );
 		}
 		// save the modified data
 		return ldap_modify( $this->connection, $results[0]['dn'], array( 'objectclass' => $results[0]['objectclass'], 'uid' => array() ) );
@@ -549,7 +570,7 @@ class ContactController extends Controller {
             // get the statistic
             $stat = $this->getStatistic( $type )->getData();
             // check if something went wrong
-            if( $stat['status'] != 'success' ) {
+            if( $stat['status'] !== 'success' ) {
                 return new DataResponse( [ 'status' => 'error' ] );
             }
             // add the data to the bundle

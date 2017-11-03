@@ -4,25 +4,29 @@ script( 'ldapcontacts', 'settings' );
 // style
 style( 'ldapcontacts', 'settings' );
 ?>
-<form id="ldapcontacts">
+<div id="ldapcontacts">
 	<div class="section">
 		<h2><?php p($l->t( 'LDAP Contacts' )); ?></h2>
-		<table>
-			<tbody>
-				<tr>
-					<td><label for="ldapcontacts_login_attribute"><?php p($l->t( 'Login Attribute' )); ?></label></td>
-					<td><input type="text" id="ldapcontacts_login_attribute" name="login_attribute" placeholder="<?php p($l->t( 'Login Attribute' )); ?>" value="<?php p( \OCP\Config::getAppValue( 'ldapcontacts', 'login_attribute', '' ) ); ?>"></td>
-				</tr>
-				<tr>
-					<td><label for="ldapcontacts_edit_login_url"><?php p($l->t( 'Edit Login URL' )); ?></label></td>
-					<td><input type="url" id="ldapcontacts_edit_login_url" name="edit_login_url" placeholder="<?php p($l->t( 'URL' )); ?>" value="<?php p( \OCP\Config::getAppValue( 'ldapcontacts', 'edit_login_url', '' ) ); ?>"></td>
-				</tr>
-			</tbody>
-		</table>
+        
+        <script id="ldapcontacts-general-settings-tpl" type="text/x-handlebars-template">
+            <table>
+                <tbody>
+                    <tr>
+                        <td><label for="ldapcontacts_form_login_attribute"><?php p($l->t( 'Login Attribute' )); ?></label></td>
+                        <td><input type="text" id="ldapcontacts_form_login_attribute" name="login_attribute" placeholder="<?php p($l->t( 'Login Attribute' )); ?>" value="{{ settings.login_attribute }}"></td>
+                    </tr>                    
+                    <tr>
+                        <td><label for="ldapcontacts_form_edit_login_url"><?php p($l->t( 'Edit Login URL' )); ?></label></td>
+                        <td><input type="url" id="ldapcontacts_form_edit_login_url" name="edit_login_url" placeholder="<?php p($l->t( 'URL' )); ?>" value="{{ settings.edit_login_url }}"></td>
+                    </tr>
+                </tbody>
+            </table>
+            
+            <button type="submit"><?php p($l->t( 'Save' )); ?></button>
+        </script>
 		
-		<button type="submit"><?php p($l->t( 'Save' )); ?></button>
-		<span id="ldapcontacts-settings-msg" class="msg"></span>
-		
+        <div id="ldapcontacts-general-settings"><span class="icon-loading"></span></div>
+        <span id="ldapcontacts-settings-msg" class="msg"></span>
 		<br>
 		
 		<!-- show and hide users section -->
@@ -73,4 +77,4 @@ style( 'ldapcontacts', 'settings' );
 		<br><h3><?php p($l->t('Hidden Groups')); ?></h3><span id="ldapcontacts-edit-group-msg" class="msg"></span>
 		<div id="ldapcontacts-edit-group"><div class="icon-loading"></div></div>
 	</div>
-</form>
+</div>

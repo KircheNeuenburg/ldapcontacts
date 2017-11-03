@@ -5,7 +5,7 @@
     <description>Display your LDAP contacts</description>
     <licence>AGPL</licence>
     <author>Alexander Hornig</author>
-    <version>0.2.2</version>
+    <version>1.0</version>
 	<types>
 		<tool/>
 	</types>

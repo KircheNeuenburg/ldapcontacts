@@ -2,20 +2,8 @@
 'use strict';
 
 $(document).ready(function(){
-	// save settings
-	$( "#ldapcontacts button[type='submit']" ).click( function ( event ) {
-		event.preventDefault();
-		// get the settings from the form
-		var settings = $( '#ldapcontacts' ).serialize();
-		// sending the new settings
-		OC.msg.startSaving( '#ldapcontacts-settings-msg' );
-		$.post( OC.filePath( 'ldapcontacts', 'ajax','save_settings.php' ), settings, function( data ) {
-			OC.msg.finishedSaving( '#ldapcontacts-settings-msg', data );
-		});
-	});
-	
 	var Contacts = function() {
-		this._baseUrl = OC.generateUrl('/apps/ldapcontacts/contacts');
+		this._baseUrl = OC.generateUrl('/apps/ldapcontacts');
 		this._hidden = [];
 		this._visible = [];
 		this._groups = [];
@@ -24,6 +12,7 @@ $(document).ready(function(){
 		this._last_group_search = '';
 		this._search_id = 0;
 		this._group_search_id = 0;
+        this._settings = [];
 	};
 	
 	Contacts.prototype = {
@@ -35,10 +24,43 @@ $(document).ready(function(){
 				contacts.loadVisible().done( function() {
 					contacts.loadHiddenGroups().done( function() {
 						contacts.loadGroups().done( function() {
-							deferred.resolve();
-						});
-					});
-				});
+                            contacts.loadSettings().done( function() {
+                                // everything loaded
+                                deferred.resolve();
+                            }).fail( function() {
+                                deferred.reject();
+                            });
+						}).fail( function() {
+                            deferred.reject();
+                        });
+					}).fail( function() {
+                        deferred.reject();
+                    });
+				}).fail( function() {
+                    deferred.reject();
+                });
+			}).fail( function() {
+                deferred.reject();
+            });
+			return deferred.promise();
+		},
+        // load all settings
+        loadSettings: function() {
+			var deferred = $.Deferred();
+			var self = this;
+			// load the contacts
+			$.get( this._baseUrl + '/settings', function( data ) {
+                if( data.status == 'success' ) {
+                    self._settings = data.data;
+				    deferred.resolve();
+                }
+                else {
+                    // contacts couldn't be loaded
+				    deferred.reject();
+                }
+			}).fail( function() {
+				// contacts couldn't be loaded
+				deferred.reject();
 			});
 			return deferred.promise();
 		},
@@ -47,9 +69,9 @@ $(document).ready(function(){
 			var deferred = $.Deferred();
 			var self = this;
 			// load the contacts
-			$.get( this._baseUrl, function(data) {
-				self._visible = data;
-				deferred.resolve();
+			$.get( this._baseUrl + '/load', function( data ) {
+                self._visible = data;
+                deferred.resolve();
 			}).fail( function() {
 				// contacts couldn't be loaded
 				deferred.reject();
@@ -61,9 +83,9 @@ $(document).ready(function(){
 			var deferred = $.Deferred();
 			var self = this;
 			// load the contacts
-			$.get( this._baseUrl + '/admin', function(data) {
-				self._hidden = data;
-				deferred.resolve();
+			$.get( this._baseUrl + '/admin', function( data ) {
+                self._hidden = data;
+                deferred.resolve();
 			}).fail( function() {
 				// contacts couldn't be loaded
 				deferred.reject();
@@ -77,11 +99,11 @@ $(document).ready(function(){
 			return this._hidden;
 		},
 		// hide a certain contact from the users
-		hideContact: function(contact) {
+		hideContact: function( contact ) {
 			var self = this;
 			OC.msg.startSaving( '#ldapcontacts-edit-user-msg' );
 			// send request
-			$.get( this._baseUrl + '/admin/hide/' + encodeURI(contact.mail), function(data) {
+			$.get( this._baseUrl + '/admin/hide/' + encodeURI( contact.mail ), function( data ) {
 				OC.msg.finishedSaving( '#ldapcontacts-edit-user-msg', data );
 				// reload all data
 				self.render();
@@ -92,7 +114,7 @@ $(document).ready(function(){
 			var self = this;
 			OC.msg.startSaving( '#ldapcontacts-edit-user-msg' );
 			// send request
-			$.get( this._baseUrl + '/admin/show/' + encodeURI(contact.mail), function(data) {
+			$.get( this._baseUrl + '/admin/show/' + encodeURI( contact.mail ), function( data ) {
 				OC.msg.finishedSaving( '#ldapcontacts-edit-user-msg', data );
 				// reload all data
 				self.render();
@@ -104,10 +126,63 @@ $(document).ready(function(){
 			// load all data
 			this.loadAll().done( function() {
 				// render the sections
+                self.renderSettings();
 				self.renderUser();
 				self.renderGroups();
 			});
 		},
+        // render the apps general settings
+        renderSettings: function() {
+            var self = this;
+            var source = $( '#ldapcontacts-general-settings-tpl' ).html();
+			var template = Handlebars.compile( source );
+			var html = template( { settings: self._settings } );
+			$( '#ldapcontacts-general-settings' ).html( html );
+            
+            // save settings button
+            $( "#ldapcontacts-general-settings button[type='submit']" ).one( 'click', function() {
+                var settings = [];
+                // get the settings from the form
+                $.each( self._settings, function( key, orig_value ) {
+                    // check if the element exists
+                    if( !$( '#ldapcontacts_form_' + key ).length ) return;
+                    // get the settings new value
+                    var value = $( '#ldapcontacts_form_' + key ).val();
+                    // if the value hasn't changed, there is no need to save anything
+                    if( value == orig_value ) {
+                        return;
+                    }
+                    
+                    // buffer the settings new value
+                    settings.push( { name: key, value: value } );
+                });
+                // check if any values have actually changed
+                if( settings.length === 0 ) {
+                    OC.msg.finishedSuccess( '#ldapcontacts-settings-msg', t( 'ldapcontacts', 'Nothing to save' ) );
+                    // reactivate the save button
+                    self.renderSettings();
+                    return;
+                }
+                
+                // send the new settings
+                OC.msg.startSaving( '#ldapcontacts-settings-msg' );
+                $.ajax({
+					url: self._baseUrl + '/settings/update',
+					method: 'POST',
+					contentType: 'application/json',
+					data: JSON.stringify( { settings: settings } )
+				}).done( function( data ) {
+                    // load and render the settings section again
+                    self.loadSettings().done( function() {
+                        self.renderSettings();
+                    });
+                    OC.msg.finishedSaving( '#ldapcontacts-settings-msg', data );
+                }).fail( function() {
+                    // if the saving failed, reactivate the save button
+                    self.renderSettings();
+                });
+            });
+        },
 		// renders the settings for showing and hiding users
 		renderUser: function() {
 			var self = this;
@@ -153,7 +228,7 @@ $(document).ready(function(){
 			
 			// if the search form is empty, clean up
 			if( search == '' ) {
-				this.renderUserSuggestions(this._visible);
+				this.renderUserSuggestions( this._visible );
 				return true;
 			}
 			
@@ -169,6 +244,7 @@ $(document).ready(function(){
 				$.each( contact, function( key, value ) {
 					if( typeof( value ) != 'string' && typeof( value ) != 'number' ) return;
 					value = String( value ).toLowerCase();
+                    
 					if( ~value.indexOf( search ) ) {
 						matches.push( contact );
 						return false;
@@ -176,7 +252,7 @@ $(document).ready(function(){
 				});
 			});
 			
-			return self.renderUserSuggestions(matches)
+			return self.renderUserSuggestions(matches);
 		},
 		renderUserSuggestions: function(users) {
 			var self = this;
@@ -204,14 +280,6 @@ $(document).ready(function(){
 			
 			return true;
 		},
-		
-		
-		
-		
-		
-		
-		
-		
 		
 		/* group functions */
 		searchGroups: function ( search ) {
@@ -276,7 +344,7 @@ $(document).ready(function(){
 			var deferred = $.Deferred();
 			var self = this;
 			// load the groups
-			$.get( this._baseUrl + '/groups', function(data) {
+			$.get( this._baseUrl + '/groups', function( data ) {
 				self._groups = data;
 				deferred.resolve();
 			}).fail( function() {
@@ -290,7 +358,7 @@ $(document).ready(function(){
 			var deferred = $.Deferred();
 			var self = this;
 			// load the groups
-			$.get( this._baseUrl + '/admin/group', function(data) {
+			$.get( this._baseUrl + '/admin/group', function( data ) {
 				self._hidden_groups = data;
 				deferred.resolve();
 			}).fail( function() {
@@ -310,7 +378,7 @@ $(document).ready(function(){
 			var self = this;
 			OC.msg.startSaving( '#ldapcontacts-edit-group-msg' );
 			// send request
-			$.get( this._baseUrl + '/admin/group/hide/' + encodeURI(group.id), function(data) {
+			$.get( this._baseUrl + '/admin/group/hide/' + encodeURI( group.id ), function( data ) {
 				OC.msg.finishedSaving( '#ldapcontacts-edit-group-msg', data );
 				// reload all data
 				self.render();
@@ -321,7 +389,7 @@ $(document).ready(function(){
 			var self = this;
 			OC.msg.startSaving( '#ldapcontacts-edit-group-msg' );
 			// send request
-			$.get( this._baseUrl + '/admin/group/show/' + encodeURI(group.id), function(data) {
+			$.get( this._baseUrl + '/admin/group/show/' + encodeURI( group.id ), function( data ) {
 				OC.msg.finishedSaving( '#ldapcontacts-edit-group-msg', data );
 				// reload all data
 				self.render();
@@ -330,25 +398,25 @@ $(document).ready(function(){
 		// renders the settings for showing and hiding groups
 		renderGroups: function (){
 			var self = this;
-			var source = $('#ldapcontacts-edit-group-tpl').html();
-			var template = Handlebars.compile(source);
-			var html = template({hidden: this.getHiddenGroups()});
-			$('#ldapcontacts-edit-group').html(html);
+			var source = $( '#ldapcontacts-edit-group-tpl' ).html();
+			var template = Handlebars.compile( source );
+			var html = template( { hidden: this.getHiddenGroups() } );
+			$( '#ldapcontacts-edit-group' ).html( html );
 			
 			// unhide a group
-			$('#ldapcontacts-edit-group .remove').click( function() {
+			$( '#ldapcontacts-edit-group .remove' ).click( function() {
 				// get the groups id
 				var id = this.attributes['target-id'].value;
 				
 				// go through all groups and find the one the id is fitting to
-				$.each( self.getHiddenGroups(), function(index, data) {
+				$.each( self.getHiddenGroups(), function( index, data ) {
 					// if this is the user, request to show him again
-					if( data['id'] == id ) self.showGroup(data);
+					if( data['id'] == id ) self.showGroup( data );
 				});
 			});
 			
 			// search form for hiding a user
-			$('#ldapcontacts-search-groups-visible').on( "change keyup paste", function() {
+			$( '#ldapcontacts-search-groups-visible' ).on( "change keyup paste", function() {
 				var value = $( this ).val();
 				
 				// check if we are still searching
@@ -360,13 +428,13 @@ $(document).ready(function(){
 			});
 			
 			// abort the search
-			$('#ldapcontacts-search-groups-visible + .abort').click( function() {
+			$( '#ldapcontacts-search-groups-visible + .abort' ).click( function() {
 				// clear the search form
-				$('#ldapcontacts-search-groups-visible').val('');
-				$('#ldapcontacts-search-groups-visible').trigger( 'change' );
+				$( '#ldapcontacts-search-groups-visible' ).val( '' );
+				$( '#ldapcontacts-search-groups-visible' ).trigger( 'change' );
 			});
-		}
-	}
+		},
+	};
 	
 	var contacts = new Contacts();
 	// initial rendering

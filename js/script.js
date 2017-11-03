@@ -4,8 +4,8 @@
 $(document).ready(function () {
 
 // this contacts object holds all our contacts
-var Contacts = function (baseUrl) {
-    this._baseUrl = baseUrl;
+var Contacts = function() {
+    this._baseUrl = OC.generateUrl( '/apps/ldapcontacts' );
     this._contacts = [];
     this._activeContact = undefined;
 	this._matches = [];
@@ -35,9 +35,19 @@ Contacts.prototype = {
         return this._contacts;
     },
     loadAll: function () {
+        var self = this;
+        var deferred = $.Deferred();
+        self.loadContacts().done( function() {
+            deferred.resolve();
+        }).fail( function() {
+            deferred.reject();
+        });
+        return deferred.promise();
+    },
+    loadContacts: function() {
         var deferred = $.Deferred();
         var self = this;
-        $.get(this._baseUrl).done(function (contacts) {
+        $.get( this._baseUrl + '/load' ).done( function( contacts ) {
             // reset variables
 			self._activeContact = undefined;
 			self._matches = [];
@@ -52,12 +62,12 @@ Contacts.prototype = {
 			
             self._contacts = contacts;
             deferred.resolve();
-        }).fail(function () {
+        }).fail( function() {
             deferred.reject();
         });
         return deferred.promise();
     },
-	search: function ( search ) {
+	search: function( search ) {
 		if( search == this._last_search ) return false;
 		this._last_search = search;
 		
@@ -84,7 +94,7 @@ Contacts.prototype = {
 		
 		return matches;
 	},
-    loadOwn: function () {
+    loadOwn: function() {
         var deferred = $.Deferred();
         var self = this;
         $.get(this._baseUrl + '/own').done(function (me) {
@@ -96,11 +106,11 @@ Contacts.prototype = {
         });
         return deferred.promise();
     },
-	getOwn: function () {
+	getOwn: function() {
 		if( typeof( this._me ) != 'object' || this._me == null ) return
 		return this._me[0];
 	},
-	updateOwn: function (givenname, sn, street, postaladdress, postalcode, l, homephone, mobile, description) {
+	updateOwn: function(givenname, sn, street, postaladdress, postalcode, l, homephone, mobile, description) {
 		var own = Object();
 		// save all the given values
 		own.givenname = givenname;
@@ -120,7 +130,7 @@ Contacts.prototype = {
             data: JSON.stringify(own)
         });
     },
-	loadGroups: function () {
+	loadGroups: function() {
 		var deferred = $.Deferred();
         var self = this;
         $.get(this._baseUrl + "/groups").done(function (groups) {
@@ -134,12 +144,14 @@ Contacts.prototype = {
 };
 
 // this will be the view that is used to update the html
-var View = function (contacts) {
+var View = function( contacts ) {
     this._contacts = contacts;
+    this._settings = [];
+    this._baseUrl = contacts._baseUrl;
 };
 
 View.prototype = {
-    renderContent: function () {
+    renderContent: function() {
 		var self = this;
         var source = $('#content-tpl').html();
         var template = Handlebars.compile(source);
@@ -154,13 +166,30 @@ View.prototype = {
 			document.execCommand('copy');
 			$input.remove();
 			
-			
-			
 			element.addClass( 'highlight highlighted' );
 			setTimeout( function() { element.removeClass( 'highlight' ); }, 500 );
 		});
     },
-    renderNavigation: function () {
+    loadSettings: function() {
+        var deferred = $.Deferred();
+        var self = this;
+        // load the contacts
+        $.get( this._baseUrl + '/settings', function( data ) {
+            if( data.status == 'success' ) {
+                self._settings = data.data;
+                deferred.resolve();
+            }
+            else {
+                // contacts couldn't be loaded
+                deferred.reject();
+            }
+        }).fail( function() {
+            // contacts couldn't be loaded
+            deferred.reject();
+        });
+        return deferred.promise();
+    },
+    renderNavigation: function() {
 		var self = this;
 		
 		if( this._contacts._last_nav_render + 100 > (new Date).getTime() ) return;
@@ -235,7 +264,7 @@ View.prototype = {
             $('#info').focus();
         });
 	},
-	renderNavigationHeader: function () {
+	renderNavigationHeader: function() {
 		var self = this;
 		var source = $('#navigation-header-tpl').html();
         var template = Handlebars.compile(source);
@@ -271,7 +300,7 @@ View.prototype = {
 			self.renderNavigation();
 		});
 	},
-	renderEditContent: function ( saved, save_failed ) {
+	renderEditContent: function( saved, save_failed ) {
 		if( typeof( saved ) == 'undefined' || saved == null ) saved = 0;
 		if( typeof( save_failed ) == 'undefined' || save_failed == null ) save_failed = 1;
 		
@@ -282,7 +311,7 @@ View.prototype = {
 		
 		var source = $('#content-edit-tpl').html();
 		var template = Handlebars.compile(source);
-		var html = template({me: self._contacts.getOwn(), 'saved': saved, 'save_failed': save_failed});
+		var html = template( { me: self._contacts.getOwn(), saved: saved, save_failed: save_failed, edit_login_url: self._settings['edit_login_url'], login_attribute: self._settings['login_attribute'] } );
 		
 		$('#info').html(html);
 		
@@ -327,11 +356,11 @@ View.prototype = {
 			});
 		});
     },
-    render: function () {
+    render: function() {
         this.renderNavigation();
         this.renderContent();
     },
-    renderEdit: function ( saved, save_failed ) {
+    renderEdit: function( saved, save_failed ) {
 		if( typeof( saved ) == 'undefined' || saved == null ) saved = 0;
 		if( typeof( save_failed ) == 'undefined' || save_failed == null ) save_failed = 1;
         this.renderEditContent( saved, save_failed );
@@ -341,7 +370,7 @@ View.prototype = {
 
 
 
-var Tutorial = function () {
+var Tutorial = function() {
 	this._baseUrl = OC.generateUrl( '/apps/ldapcontacts' );
 	this._state = 0;
 	this._max_state = 3;
@@ -360,12 +389,18 @@ Tutorial.prototype = {
         var self = this;
 		
 		// send request for the users setting
-		$.get( this._baseUrl + '/settings/personal/tutorial_state' ).done( function( state ) {
-			// check if the value is valid
-			if( Math.floor( state ) != state || !$.isNumeric( state ) ) state = 0;
-			// set the users state
-			self._state = state;
-			return deferred.resolve();
+		$.get( this._baseUrl + '/settings/personal/tutorial_state' ).done( function( data ) {
+            if( data.status == 'success' ) {
+                var state = data.data;
+                // check if the value is valid
+                if( Math.floor( state ) != state || !$.isNumeric( state ) ) state = 0;
+                // set the users state
+                self._state = state;
+                return deferred.resolve();
+            }
+			else {
+                deferred.reject();
+            }
 		}).fail( function(data) {
             deferred.reject();
         });
@@ -426,8 +461,7 @@ Tutorial.prototype = {
 	saveState: function() {
 		var settings = new Object();
 		settings.key = 'tutorial_state';
-		settings.value = this._state;
-		
+		settings.value = this._state;		
 		// save the state
 		return $.ajax({
             url: this._baseUrl + '/settings/personal',
@@ -439,24 +473,24 @@ Tutorial.prototype = {
 };
 
 
-
-
 var tutorial = new Tutorial();
 
-var contacts = new Contacts(OC.generateUrl('/apps/ldapcontacts/contacts'));
+var contacts = new Contacts();
 var view = new View(contacts);
 contacts.loadAll().done(function () {
 	contacts.loadOwn().done(function() {
 		contacts.loadGroups().done(function() {
-			view.renderEdit();
-			view.render();
-			view.renderSettings();
-			view.renderNavigationHeader();
-			// load the tutorial
-			tutorial.getState().done( function() {
-				// show the first tutorial text
-				tutorial.next();
-			});
+            view.loadSettings().done( function() {
+                view.renderEdit();
+                view.render();
+                view.renderSettings();
+                view.renderNavigationHeader();
+                // load the tutorial
+                tutorial.getState().done( function() {
+                    // show the first tutorial text
+                    tutorial.next();
+                });
+            });
 		});
 	});
 }).fail(function () {

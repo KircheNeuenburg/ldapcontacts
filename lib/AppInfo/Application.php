@@ -13,7 +13,7 @@ namespace OCA\LdapContacts\AppInfo;
 
 use \OCP\AppFramework\App;
 use OCA\LdapContacts\Controller\ContactController;
-use OCA\LdapContacts\Controller\UserSettingsController;
+use OCA\LdapContacts\Controller\SettingsController;
 use OCA\LdapContacts\Settings\Admin;
 
 class Application extends App {
@@ -32,8 +32,9 @@ class Application extends App {
 	private function registerServices() {
         $container = $this->getContainer();
 		$container->registerAlias( 'ContactController', ContactController::class);
-		$container->registerAlias( 'UserSettingsController', UserSettingsController::class);
+		$container->registerAlias( 'SettingsController', SettingsController::class);
 		$container->registerAlias( 'Admin', Admin::class);
+		$container->registerAlias( 'AdminStatistics', AdminStatistics::class);
     }
 	
 	/**

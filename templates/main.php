@@ -4,8 +4,6 @@ script('ldapcontacts', 'script');
 // styles
 style('ldapcontacts', 'style');
 style('ldapcontacts', 'tutorial');
-// available data
-$data = array( 'mail' => 'Mail', 'givenname' => 'First Name', 'sn' => 'Last Name', 'street' => 'Street', 'postaladdress' => 'House number', 'postalcode' => 'zip Code', 'l' => 'City', 'homephone' => 'Phone', 'mobile' => 'Mobile', 'description' => 'About me' );
 ?>
 <div id="app">
 	<div id="app-navigation">
@@ -50,9 +48,9 @@ $data = array( 'mail' => 'Mail', 'givenname' => 'First Name', 'sn' => 'Last Name
 				<h2>{{#if contact.name}}{{ contact.name }}{{/if}}</h2>
 				<table>
 					<tbody>
-						<?php
-						foreach( $data as $key => $name ) {
-							echo '{{#if contact.'; p( $key ); echo '}}<tr><td>'; p($l->t( $name )); echo '</td> <td><span>{{ contact.'; p( $key ); echo ' }}</span></td> <td><a class="icon-copy" href="#" title="'; p($l->t( 'Copy to clipboard' )); echo '"></a></td></tr>{{/if}}';
+                        <?php
+                        foreach( $_['user_ldap_attributes'] as $key => $name ) {
+							echo '{{#if contact.'; p( $key ); echo '}}<tr><td>'; p( $name ); echo '</td> <td><span>{{ contact.'; p( $key ); echo ' }}</span></td> <td><a class="icon-copy" href="#" title="'; p($l->t( 'Copy to clipboard' )); echo '"></a></td></tr>{{/if}}';
 						}
 						?>
 						{{#if contact.groups }}
@@ -83,23 +81,23 @@ $data = array( 'mail' => 'Mail', 'givenname' => 'First Name', 'sn' => 'Last Name
 					<div class="alert alert-success"><?php p($l->t( 'Your data has successfully been saved' )); ?></div>
 				{{/if}}
 			{{/if}}
-			
+            
 			{{#if me}}
-				<?php if( \OCP\Config::getAppValue( 'ldapcontacts', 'edit_login_url', '' ) != '' ) { ?>
+				{{#if edit_login_url}}
 					<b><?php p($l->t( 'If you want to change your login data, use the following link:' )) ?> </b>
-					<a href="<?php p( \OCP\Config::getAppValue( 'ldapcontacts', 'edit_login_url', '' ) ); ?>"><?php p($l->t( 'Edit login' )); ?></a>
+					<a href="{{ edit_login_url }}"><?php p($l->t( 'Edit login' )); ?></a>
 					<br>
-				<?php } ?>
+				{{/if}}
 				
 				<table class="own">
 					<tbody>
 						<?php
-						foreach( $data as $key => $name ) {
+						foreach( $_['user_ldap_attributes'] as $key => $name ) {
 							// don't show the login attribute here
-							if( $key == \OCP\Config::getAppValue( 'ldapcontacts', 'login_attribute', '' ) ) continue;
+							if( $key === $_['login_attribute'] ) continue;
 							echo '<tr>';
-								echo '<td><label for="edit_'; p( $key ); echo'">'; p($l->t($name)); echo'</label></td>';
-								echo '<td><input type="text" name="'; p( $key ); echo '" id="edit_'; p( $key ); echo'" value="{{#if me.'; p($key); echo ' }}{{ me.'; p( $key ); echo ' }}{{/if}}"></td>';
+								echo '<td><label for="edit_'; p( $key ); echo'">'; p( $name ); echo'</label></td>';
+								echo '<td><input type="text" name="'; p( $key ); echo '" id="edit_'; p( $key ); echo'" value="{{#if me.'; p( $key ); echo ' }}{{ me.'; p( $key ); echo ' }}{{/if}}"></td>';
 							echo '</tr>';
 						}
 						?>
