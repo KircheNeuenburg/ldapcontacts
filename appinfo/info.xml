@@ -1,15 +1,26 @@
 <?xml version="1.0"?>
-<info>
+<info xmlns:xsi= "http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://apps.nextcloud.com/schema/apps/info.xsd">
     <id>ldapcontacts</id>
-    <name>LDAP Contacts</name>
-    <description>Display your LDAP contacts</description>
-    <licence>AGPL</licence>
-    <author>Alexander Hornig</author>
+    <name land="en">LDAP Contacts</name>
+    <description lang="en">Display your LDAP contacts</description>
     <version>1.0.0</version>
+    <licence>AGPL</licence>
+    <author mail="alexander@h-software.de" homepage="https://h-software.de">Alexander Hornig</author>
+    <namespace>LdapContacts</namespace>
+    
 	<types>
 		<tool/>
 	</types>
-	<namespace>LdapContacts</namespace>
+    
+    <category>tool</category>
+    
+    <website>https://github.com/KircheNeuenburg/ldapcontacts</website>
+    
+    <bugs>https://github.com/KircheNeuenburg/ldapcontacts/issues</bugs>
+
+    <repository type="git">https://github.com/KircheNeuenburg/ldapcontacts.git</repository>
+    
+    <screenshot>https://raw.githubusercontent.com/KircheNeuenburg/ldapcontacts/master/screenshots/main.jpg</screenshot>
 	
     <dependencies>
         <user_ldap/>
