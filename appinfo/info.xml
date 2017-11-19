@@ -9,10 +9,10 @@
     <namespace>LdapContacts</namespace>
     
 	<types>
-		<tools/>
+		<tool/>
 	</types>
     
-    <category>tool</category>
+    <category>tools</category>
     
     <website>https://github.com/KircheNeuenburg/ldapcontacts</website>
     
