@@ -9,7 +9,7 @@
     <namespace>LdapContacts</namespace>
     
 	<types>
-		<tool/>
+		<tools/>
 	</types>
     
     <category>tool</category>
