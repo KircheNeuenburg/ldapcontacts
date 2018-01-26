@@ -117,6 +117,7 @@
 }
 /* end of search */
 
+/* TODO(hornigal): move this to the ldaporg app */
 #ldaporg-existing-users {
 	width: 30%;
 }
@@ -128,3 +129,13 @@
 #LdapOrgSettings .button {
 	display: inline-block;
 }
+
+#ldapcontacts table.ldap-attributes tbody td {
+	padding-right: 10px;
+}
+/* buttons */
+#ldapcontacts .ldap-attributes button.icon {
+	min-height: 35px;
+	min-width: 35px;
+}
+/* end of buttons */

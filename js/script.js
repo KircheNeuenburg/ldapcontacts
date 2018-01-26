@@ -110,35 +110,17 @@ Contacts.prototype = {
 		if( typeof( this._me ) != 'object' || this._me == null ) return
 		return this._me[0];
 	},
-	updateOwn: function(givenname, sn, street, postaladdress, postalcode, l, homephone, mobile, description) {
-		var own = Object();
-		// save all the given values
-		own.givenname = givenname;
-		own.sn = sn;
-		own.street = street;
-		own.postaladdress = postaladdress;
-		own.postalcode = postalcode;
-		own.l = l;
-		own.homephone = homephone;
-		own.mobile = mobile;
-		own.description = description;
-		
-        return $.ajax({
-            url: this._baseUrl + '/own',
-            method: 'POST',
-            contentType: 'application/json',
-            data: JSON.stringify(own)
-        });
-    },
 	loadGroups: function() {
 		var deferred = $.Deferred();
         var self = this;
+		
         $.get(this._baseUrl + "/groups").done(function (groups) {
             self._groups = groups;
             deferred.resolve();
         }).fail(function () {
             deferred.reject();
         });
+		
         return deferred.promise();
 	}
 };
@@ -311,7 +293,7 @@ View.prototype = {
 		
 		var source = $('#content-edit-tpl').html();
 		var template = Handlebars.compile(source);
-		var html = template( { me: self._contacts.getOwn(), saved: saved, save_failed: save_failed, edit_login_url: self._settings['edit_login_url'], login_attribute: self._settings['login_attribute'] } );
+		var html = template( { me: self._contacts.getOwn(), saved: saved, save_failed: save_failed, edit_login_url: self._settings['edit_login_url'] } );
 		
 		$('#info').html(html);
 		
@@ -331,18 +313,21 @@ View.prototype = {
 			this.disabled = true;
 			$( this ).after( $( document.createElement( "span" ) ).addClass( "icon-loading" ) );
 			
-			var givenname_val = givenname.val();
-			var sn_val = sn.val();
-			var street_val = street.val();
-			var postaladdress_val = postaladdress.val();
-			var postalcode_val = postalcode.val();
-			var l_val = l.val();
-			var homephone_val = homephone.val();
-			var mobile_val = mobile.val();
-			var description_val = description.val();
+			var data = {};
+			data.data = jQuery( '#edit_own' ).serialize();
 			
-			self._contacts.updateOwn(givenname_val, sn_val, street_val, postaladdress_val, postalcode_val, l_val, homephone_val, mobile_val, description_val).done(function (data) {
-				if( data == "SUCCESS" ) {
+			// update own data
+			return $.ajax({
+				url: self._baseUrl + '/own',
+				method: 'POST',
+				contentType: 'application/json',
+				data: JSON.stringify( data )
+			}).done(function (data) {
+				
+				console.log( data );
+				
+				
+				if( data.status == "success" ) {
 					self._contacts.loadAll().done(function() {
 						self._contacts.loadOwn().done(function() {
 							self.renderNavigation();

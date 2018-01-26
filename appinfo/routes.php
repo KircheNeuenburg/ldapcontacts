@@ -42,5 +42,6 @@ return [
 	   [ 'name' => 'settings#getSettings', 'url' => '/settings', 'verb' => 'GET' ],
 	   [ 'name' => 'settings#getSetting', 'url' => '/setting/{type}', 'verb' => 'GET' ],
 	   [ 'name' => 'settings#updateSetting', 'url' => '/setting', 'verb' => 'POST' ],
+	   [ 'name' => 'settings#arraySettingRemoveKey', 'url' => '/setting/array/remove', 'verb' => 'POST' ],
     ]
 ];

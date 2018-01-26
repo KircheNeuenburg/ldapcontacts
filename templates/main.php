@@ -89,20 +89,21 @@ style('ldapcontacts', 'tutorial');
 					<br>
 				{{/if}}
 				
+				<form id="edit_own">
 				<table class="own">
 					<tbody>
 						<?php
 						foreach( $_['user_ldap_attributes'] as $key => $name ) {
-							// don't show the login attribute here
-							if( $key === $_['login_attribute'] ) continue;
 							echo '<tr>';
 								echo '<td><label for="edit_'; p( $key ); echo'">'; p( $name ); echo'</label></td>';
-								echo '<td><input type="text" name="'; p( $key ); echo '" id="edit_'; p( $key ); echo'" value="{{#if me.'; p( $key ); echo ' }}{{ me.'; p( $key ); echo ' }}{{/if}}"></td>';
+								echo '<td><input type="text" name="user_ldap_attributes[\''; p( $key ); echo '\']" id="edit_'; p( $key ); echo'" value="{{#if me.'; p( $key ); echo ' }}{{ me.'; p( $key ); echo ' }}{{/if}}"></td>';
 							echo '</tr>';
 						}
 						?>
 					</tbody>
 				</table>
+				</form>
+				
 				<button><?php p($l->t('Save')); ?></button>
 			{{else}}
 				<h3><?php p($l->t('No contact data could be found')); ?></h3>

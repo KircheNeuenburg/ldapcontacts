@@ -138,32 +138,76 @@ $(document).ready(function(){
 			var template = Handlebars.compile( source );
 			var html = template( { settings: self._settings } );
 			$( '#ldapcontacts-general-settings' ).html( html );
-            
+			
+			// remove attribute button
+			$( "#ldapcontacts-general-settings" ).on( 'click', '.remove-attribute', function( e ) {
+				var element = $( this );
+				// disable remove button and show loading circle
+				element.disabled = true;
+				element.removeClass( 'icon-delete' ).addClass( 'icon-loading' );
+				
+				// if this is an old, existing attribute, the setting has to be updated
+				if( !element.attr( 'new_attribute' ) ) {
+					// get the attribute to be removed
+					var attribute = $( e.target ).attr( 'attribute' );
+					
+					// remove the attribute
+					$.ajax({
+						url: self._baseUrl + '/setting/array/remove',
+						method: 'POST',
+						contentType: 'application/json',
+						data: JSON.stringify( { setting_key: 'user_ldap_attributes', key: attribute } )
+					}).done( function( data ) {
+						if( data.status == 'success' ) {
+							// remove the html element
+							element.parent().parent().remove();
+						}
+						else {
+							// if the saving failed, reactivate the remove button
+							element.disabled = false;
+							element.removeClass( 'icon-loading' ).addClass( 'icon-delete' );
+						}
+						// show a message to the user
+						OC.msg.finishedSaving( '#ldapcontacts-settings-msg', data );
+					}).fail( function() {
+						// if the saving failed, reactivate the remove button
+						element.disabled = false;
+						element.removeClass( 'icon-loading' ).addClass( 'icon-delete' );
+						OC.msg.finishedError( '#ldapcontacts-settings-msg', t( 'ldapcontacts', 'Removing the attribute failed' ) );
+					});
+				}
+				// if this is a new attribute, we only have to remove the html
+				else {
+					// remove the html element
+					element.parent().parent().remove();
+				}
+				
+			});
+			
+			// add attribute button
+			$( "#ldapcontacts-general-settings .add-attribute" ).click( function( e ) {
+				// get the next id to use
+				if( typeof( self.user_ldap_attributes_id ) == 'undefined' || self.user_ldap_attributes_id === null ) {
+					self.user_ldap_attributes_id = Object.keys( self._settings.user_ldap_attributes ).length;
+				}
+				else {
+					self.user_ldap_attributes_id++;
+				}
+				
+				// render html template
+				var source = $( '#ldapcontacts-general-settings-new-attribute-tpl' ).html();
+				var template = Handlebars.compile( source );
+				var html = template( { index: self.user_ldap_attributes_id } );
+				
+				// add the new attribute to the table
+				$( '#ldapcontacts-general-settings .ldap-attributes' ).children( 'tbody' ).append( html );
+			});
+			
             // save settings button
-            $( "#ldapcontacts-general-settings button[type='submit']" ).one( 'click', function() {
-                var settings = [];
-                // get the settings from the form
-                $.each( self._settings, function( key, orig_value ) {
-                    // check if the element exists
-                    if( !$( '#ldapcontacts_form_' + key ).length ) return;
-                    // get the settings new value
-                    var value = $( '#ldapcontacts_form_' + key ).val();
-                    // if the value hasn't changed, there is no need to save anything
-                    if( value == orig_value ) {
-                        return;
-                    }
-                    
-                    // buffer the settings new value
-                    settings.push( { name: key, value: value } );
-                });
-                // check if any values have actually changed
-                if( settings.length === 0 ) {
-                    OC.msg.finishedSuccess( '#ldapcontacts-settings-msg', t( 'ldapcontacts', 'Nothing to save' ) );
-                    // reactivate the save button
-                    self.renderSettings();
-                    return;
-                }
-                
+            $( "#ldapcontacts-general-settings button[type='submit']" ).on( 'click', function( e ) {
+				e.preventDefault();
+				// get the settings from the form
+				var settings = $( '#ldapcontacts-general-settings-form' ).serialize();
                 // send the new settings
                 OC.msg.startSaving( '#ldapcontacts-settings-msg' );
                 $.ajax({
