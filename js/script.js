@@ -323,10 +323,6 @@ View.prototype = {
 				contentType: 'application/json',
 				data: JSON.stringify( data )
 			}).done(function (data) {
-				
-				console.log( data );
-				
-				
 				if( data.status == "success" ) {
 					self._contacts.loadAll().done(function() {
 						self._contacts.loadOwn().done(function() {

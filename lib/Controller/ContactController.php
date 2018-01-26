@@ -235,7 +235,7 @@ class ContactController extends Controller {
 		unset( $results['count'] );
 		$return = array();
 		
-		$ldap_attributes = array_merge( $this->settings->getSetting( 'user_ldap_attributes', false ), [ $this->user_display_name => '' ] );
+		$ldap_attributes = array_merge( $this->settings->getSetting( 'user_ldap_attributes', false ), [ $this->user_display_name => '', $this->settings->getSetting( 'user_group_id_attribute', false ) => '' ] );
 		$id = 1;
 		
 		foreach( $results as $i => $result ) {
@@ -304,6 +304,7 @@ class ContactController extends Controller {
 		// construct the filter
 		$user_group_id_group_attribute = $this->settings->getSetting( 'user_group_id_group_attribute', false );
 		$filter = '(&' . $this->group_filter . '(' . $user_group_id_group_attribute . '=' . $user_group_id_attribute . '))';
+		
 		// search the entries
 		$result = ldap_list($this->connection, $this->group_dn, $filter);
 		$entries = ldap_get_entries($this->connection, $result);
