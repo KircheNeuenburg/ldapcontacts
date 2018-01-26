@@ -127,11 +127,9 @@ class ContactController extends Controller {
 		$this->group_dn = $config['ldap_base_groups'];
 		$this->admin_dn = $config['ldap_dn'];
 		$this->admin_pwd = $config['ldap_agent_password'];
-		$this->user_filter =  '(&' . $config['ldap_userlist_filter'] . '(!(objectClass=shadowAccount)))';
-		$this->user_filter_hidden =  '(&' . $config['ldap_userlist_filter'] . '(objectClass=shadowAccount))';
+		$this->user_filter =  $config['ldap_userlist_filter'];
 		$this->user_filter_specific = $config['ldap_login_filter'];
-		$this->group_filter = '(&' . $config['ldap_group_filter'] . '(!(objectClass=shadowAccount)))';
-		$this->group_filter_hidden =  '(&' . $config['ldap_group_filter'] . '(objectClass=shadowAccount))';
+		$this->group_filter = $config['ldap_group_filter'];
 		$this->group_filter_specific = '(&' . $config['ldap_group_filter'] . '(gidNumber=%gid))';
 		$this->ldap_version = 3;
 		$this->user_display_name = $config['ldap_display_name'];
@@ -277,6 +275,7 @@ class ContactController extends Controller {
 		}
 		
 		// check if the users should be ordered by firstname or by lastname
+		// TODO(hornigal): let the user select an attribute
 		if( $this->config->getUserValue( $this->uid, $this->AppName, 'order_by' ) === 'lastname' ) {
 			// order the contacts by lastname
 			usort( $return, function( $a, $b ) {
@@ -393,12 +392,8 @@ class ContactController extends Controller {
 	protected function get_own_dn() {
 		// check this user actually has a uid
 		if( empty( $this->uid ) ) return false;
-		
-		$user = $this->get_users( $this->user_filter, $this->uid, true );
-		// check if the user has been found
-		if( !isset( $user[0]['dn'] ) || empty( trim( $user[0]['dn'] ) ) ) return false;
-		// extract dn from array and return it
-		return $user[0]['dn'];
+		// get the users dn
+		return $this->access->username2dn( $this->uid );
 	}
 	
 	/**
