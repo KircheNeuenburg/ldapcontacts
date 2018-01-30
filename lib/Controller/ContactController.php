@@ -94,6 +94,8 @@ class ContactController extends Controller {
         
         // define ldap attributes
         $this->contacts_available_attributes = $this->settings->getSetting( 'user_ldap_attributes', false );
+	// make sure attribtues are given
+	if( !is_array( $this->contacts_available_attributes ) ) $this->contacts_available_attributes = [];
 		
 		// set the ldap attributes that are filled out by default
 		$this->contacts_default_attributes = [ $this->settings->getSetting( 'login_attribute', false ), 'givenname', 'sn' ];
@@ -246,6 +248,8 @@ class ContactController extends Controller {
 		unset( $results['count'] );
 		$return = array();
 		$ldap_attributes = array_merge( $this->settings->getSetting( 'user_ldap_attributes', false ), [ $this->user_display_name => '', $user_group_id_attribute => '' ] );
+		// make sure attributes are given
+		if( !is_array( $ldap_attributes ) ) $ldap_attributes = [];
 		
 		// get all hidden users
 		$hidden = $this->adminGetEntryHidden( 'user', false );
@@ -286,7 +290,8 @@ class ContactController extends Controller {
 			if( empty( $tmp['ldapcontacts_name'] = trim( $tmp['ldapcontacts_name'] ) ) ) continue;
 			
 			// get the users groups
-			$groups = $this->getGroups( $result[ $user_group_id_attribute ] );
+			$group_uid_attribute = is_array( $result[ $user_group_id_attribute ] ) ? $result[ $user_group_id_attribute ][0] : $result[ $user_group_id_attribute ];
+			$groups = $this->getGroups( $group_uid_attribute );
 			if( $groups ) $tmp['groups'] = $groups;
 			else $tmp['groups'] = array();
 			

@@ -54,7 +54,7 @@ class SettingsController extends Controller {
 			'user_group_id_group_attribute' => 'memberUid',
             'edit_login_url' => '',
             // available data
-            'user_ldap_attributes' => [ 'mail' => $this->l->t( 'Mail' ), 'givenname' => $this->l->t( 'First Name' ), 'sn' => $this->l->t( 'Last Name' ), 'street' => $this->l->t( 'Street' ), 'postaladdress' => $this->l->t( 'House number' ), 'postalcode' => $this->l->t( 'zip Code' ), 'l' => $this->l->t( 'City' ), 'homephone' => $this->l->t( 'Phone' ), 'mobile' => $this->l->t( 'Mobile' ), 'description' => $this->l->t( 'About me' ) ],
+            'user_ldap_attributes' => [ 'mail' => $this->l->t( 'Mail' ), 'givenname' => $this->l->t( 'First Name' ), 'sn' => $this->l->t( 'Last Name' ), 'street' => $this->l->t( 'Address' ), 'postalcode' => $this->l->t( 'zip Code' ), 'l' => $this->l->t( 'City' ), 'homephone' => $this->l->t( 'Phone' ), 'mobile' => $this->l->t( 'Mobile' ) ],
 			'entry_id_attribute' => 'entryuuid',
         ];
         // set default user values
@@ -115,7 +115,7 @@ class SettingsController extends Controller {
         // return message and data if given
         if( !is_bool( $data ) ) {
 			// if this is an array setting, decode it
-			if( in_array( $key, $this->array_settings ) ) $data = json_decode( $data, true );
+			if( in_array( $key, $this->array_settings ) && !is_array( $data ) ) $data = json_decode( $data, true );
 			
 			// return the data
             if( $DataResponse ) return new DataResponse( [ 'data' => $data, 'status' => 'success' ] );
