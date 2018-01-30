@@ -82,7 +82,7 @@ style( 'ldapcontacts', [ 'settings', 'statistics' ] );
 				<div class="container">
 					{{#each hidden}}
 						<span class="edit-user">
-							<span class="name">{{ name }}</span><span class="remove" target-id="{{ id }}">X</span>
+							<span class="name">{{ ldapcontacts_name }}</span><span class="remove" target-id="{{ ldapcontacts_entry_id }}">X</span>
 						</span>
 					{{/each}}
 				</div>

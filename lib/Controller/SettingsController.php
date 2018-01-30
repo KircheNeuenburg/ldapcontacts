@@ -55,6 +55,7 @@ class SettingsController extends Controller {
             'edit_login_url' => '',
             // available data
             'user_ldap_attributes' => [ 'mail' => $this->l->t( 'Mail' ), 'givenname' => $this->l->t( 'First Name' ), 'sn' => $this->l->t( 'Last Name' ), 'street' => $this->l->t( 'Street' ), 'postaladdress' => $this->l->t( 'House number' ), 'postalcode' => $this->l->t( 'zip Code' ), 'l' => $this->l->t( 'City' ), 'homephone' => $this->l->t( 'Phone' ), 'mobile' => $this->l->t( 'Mobile' ), 'description' => $this->l->t( 'About me' ) ],
+			'entry_id_attribute' => 'entryuuid',
         ];
         // set default user values
         $this->user_default = [
@@ -69,14 +70,17 @@ class SettingsController extends Controller {
 	 * @param string $key
 	 * @NoAdminRequired
 	 */
-	public function getUserValue( $key ) {
+	public function getUserValue( $key, $DataResponse=true ) {
 		// check if this is a valid setting
 		if( !isset( $this->user_default[ $key ] ) ) return false;
         // get the setting
         $data = $this->config->getUserValue( $this->uid, $this->AppName, $key, $this->user_default[ $key ] );
         // return message and data if given
-		if( $data !== false ) return new DataResponse( [ 'data' => $data, 'status' => 'success' ] );
-        else return new DataResponse( [ 'status' => 'error' ] );
+		if( $DataResponse ) {
+			if( $data !== false ) return new DataResponse( [ 'data' => $data, 'status' => 'success' ] );
+			else return new DataResponse( [ 'status' => 'error' ] );
+		}
+		else return $data;
 	}
     
 	/**
@@ -100,6 +104,8 @@ class SettingsController extends Controller {
      * 
      * @param string $key
      * @param bool $DataResponse
+	 * 
+	 * @NoAdminRequired
 	 */
 	public function getSetting( $key, $DataResponse=true ) {
 		// check if this is a valid setting
@@ -169,7 +175,7 @@ class SettingsController extends Controller {
 				}
 				
 				// process the attributes name
-				$attribute = trim( $attr["'attribute'"] );
+				$attribute = strtolower( trim( $attr["'attribute'"] ) );
 				if( empty( $attribute ) ) continue;
 
 				// process the attributes label

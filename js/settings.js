@@ -25,8 +25,8 @@ $(document).ready(function(){
 					contacts.loadHiddenGroups().done( function() {
 						contacts.loadGroups().done( function() {
                             contacts.loadSettings().done( function() {
-                                // everything loaded
-                                deferred.resolve();
+								// everything loaded
+								deferred.resolve();
                             }).fail( function() {
                                 deferred.reject();
                             });
@@ -83,8 +83,10 @@ $(document).ready(function(){
 			var deferred = $.Deferred();
 			var self = this;
 			// load the contacts
-			$.get( this._baseUrl + '/admin', function( data ) {
-                self._hidden = data;
+			$.get( this._baseUrl + '/admin/hidden/user', function( data ) {
+				if( data.status == 'success' ) {
+					self._hidden = data.data;
+				}
                 deferred.resolve();
 			}).fail( function() {
 				// contacts couldn't be loaded
@@ -232,7 +234,7 @@ $(document).ready(function(){
 			var self = this;
 			var source = $('#ldapcontacts-edit-user-tpl').html();
 			var template = Handlebars.compile(source);
-			var html = template({hidden: this.getHidden()});
+			var html = template( { hidden: this.getHidden() } );
 			$('#ldapcontacts-edit-user').html(html);
 			
 			// unhide a user
@@ -402,7 +404,7 @@ $(document).ready(function(){
 			var deferred = $.Deferred();
 			var self = this;
 			// load the groups
-			$.get( this._baseUrl + '/admin/group', function( data ) {
+			$.get( this._baseUrl + '/admin/hidden/group', function( data ) {
 				self._hidden_groups = data;
 				deferred.resolve();
 			}).fail( function() {
