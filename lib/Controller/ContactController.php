@@ -276,15 +276,16 @@ class ContactController extends Controller {
 			}
 			
 			// add the entrys id
+			if( !isset( $result[ $entry_id_attribute ] ) || empty( $result[ $entry_id_attribute ] ) ) continue;
 			$tmp['ldapcontacts_entry_id'] = is_array( $result[ $entry_id_attribute ] ) ? $result[ $entry_id_attribute ][0] : $result[ $entry_id_attribute ];
 			
 			// a contact has to have a name
 			// TODO: check if it might be useful to put a placeholder here if no name is given
-			if( empty( trim( $tmp[ $this->user_display_name ] ) ) ) continue;
-			$tmp['ldapcontacts_name'] = $tmp[ $this->user_display_name ];
+			if( !isset( $result[ $this->user_display_name ] ) || empty( trim( $result[ $this->user_display_name ] ) ) ) continue;
+			$tmp['ldapcontacts_name'] = $result[ $this->user_display_name ];
 			
 			// get the users groups
-			$groups = $this->getGroups( $tmp[ $user_group_id_attribute ] );
+			$groups = $this->getGroups( $result[ $user_group_id_attribute ] );
 			if( $groups ) $tmp['groups'] = $groups;
 			else $tmp['groups'] = array();
 			
