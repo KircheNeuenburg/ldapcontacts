@@ -105,7 +105,7 @@ $(document).ready(function(){
 			var self = this;
 			OC.msg.startSaving( '#ldapcontacts-edit-user-msg' );
 			// send request
-			$.get( this._baseUrl + '/admin/hide/' + encodeURI( contact.mail ), function( data ) {
+			$.get( this._baseUrl + '/admin/hide/user/' + encodeURI( contact.ldapcontacts_entry_id ), function( data ) {
 				OC.msg.finishedSaving( '#ldapcontacts-edit-user-msg', data );
 				// reload all data
 				self.render();
@@ -116,7 +116,7 @@ $(document).ready(function(){
 			var self = this;
 			OC.msg.startSaving( '#ldapcontacts-edit-user-msg' );
 			// send request
-			$.get( this._baseUrl + '/admin/show/' + encodeURI( contact.mail ), function( data ) {
+			$.get( this._baseUrl + '/admin/show/' + encodeURI( contact.ldapcontacts_entry_id ), function( data ) {
 				OC.msg.finishedSaving( '#ldapcontacts-edit-user-msg', data );
 				// reload all data
 				self.render();
@@ -245,7 +245,7 @@ $(document).ready(function(){
 				// go through all users and find the one the id is fitting to
 				$.each( self.getHidden(), function(index, data) {
 					// if this is the user, request to show him again
-					if( data['id'] == id ) self.showContact(data);
+					if( data['ldapcontacts_entry_id'] == id ) self.showContact(data);
 				});
 			});
 			
@@ -312,7 +312,7 @@ $(document).ready(function(){
 					var html = $(document.createElement('div'))
 					.addClass('suggestion')
 					// add the users name
-					.text(user.name)
+					.text(user.ldapcontacts_name)
 					// add the contact information to the suggestion
 					.data('contact', user)
 					// when clicked on the user, he will be hidden
@@ -371,12 +371,12 @@ $(document).ready(function(){
 					var html = $(document.createElement('div'))
 					.addClass('suggestion')
 					// add the groups name
-					.text(group.cn)
+					.text(group.ldapcontacts_name)
 					// add the contact information to the suggestion
-					.data('contact', group)
+					.data('group', group)
 					// when clicked on the group, it will be hidden
 					.click(function() {
-						self.hideGroup( $(this).data('contact') );
+						self.hideGroup( $(this).data('group') );
 					});
 					// add the option to the search suggestions
 					$('#ldapcontacts-edit-group .search + .search-suggestions').append(html);
@@ -405,8 +405,16 @@ $(document).ready(function(){
 			var self = this;
 			// load the groups
 			$.get( this._baseUrl + '/admin/hidden/group', function( data ) {
-				self._hidden_groups = data;
-				deferred.resolve();
+				if( data.status == 'success' ) {
+					// groups loaded
+					self._hidden_groups = data.data;
+					deferred.resolve();
+				}
+				else {
+					// groups couldn't be loaded
+					deferred.reject();
+				}
+				
 			}).fail( function() {
 				// groups couldn't be loaded
 				deferred.reject();
@@ -424,7 +432,7 @@ $(document).ready(function(){
 			var self = this;
 			OC.msg.startSaving( '#ldapcontacts-edit-group-msg' );
 			// send request
-			$.get( this._baseUrl + '/admin/group/hide/' + encodeURI( group.id ), function( data ) {
+			$.get( this._baseUrl + '/admin/hide/group/' + encodeURI( group.ldapcontacts_entry_id ), function( data ) {
 				OC.msg.finishedSaving( '#ldapcontacts-edit-group-msg', data );
 				// reload all data
 				self.render();
@@ -435,7 +443,7 @@ $(document).ready(function(){
 			var self = this;
 			OC.msg.startSaving( '#ldapcontacts-edit-group-msg' );
 			// send request
-			$.get( this._baseUrl + '/admin/group/show/' + encodeURI( group.id ), function( data ) {
+			$.get( this._baseUrl + '/admin/show/' + encodeURI( group.ldapcontacts_entry_id ), function( data ) {
 				OC.msg.finishedSaving( '#ldapcontacts-edit-group-msg', data );
 				// reload all data
 				self.render();
@@ -457,7 +465,7 @@ $(document).ready(function(){
 				// go through all groups and find the one the id is fitting to
 				$.each( self.getHiddenGroups(), function( index, data ) {
 					// if this is the user, request to show him again
-					if( data['id'] == id ) self.showGroup( data );
+					if( data.ldapcontacts_entry_id == id ) self.showGroup( data );
 				});
 			});
 			

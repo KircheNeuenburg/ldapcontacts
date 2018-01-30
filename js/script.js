@@ -20,7 +20,7 @@ Contacts.prototype = {
     load: function (id) {
         var self = this;
         this._contacts.forEach(function (contact) {
-            if (contact.id === id) {
+            if (contact.ldapcontacts_entry_id === id) {
                 contact.active = true;
                 self._activeContact = contact;
             } else {
@@ -55,9 +55,9 @@ Contacts.prototype = {
 			// do special actions on every contact
 			$.each( contacts, function( i, contact ) {
 				// add the general group to all contacts
-				contacts[i].groups.push( {id: 'all'} );
+				contacts[i].groups.push( { ldapcontacts_entry_id: 'all' } );
 				// add all contact ids to the match
-				self._matches.push( contact.id );
+				self._matches.push( contact.ldapcontacts_entry_id );
 			});
 			
             self._contacts = contacts;
@@ -77,16 +77,15 @@ Contacts.prototype = {
 		search = search.toLowerCase();
 		
 		var matches = [];
-		var ids = [];
 		
 		$( this._contacts ).each( function( i, contact ) {
 			if( self._search_id != id ) return false;
-			ids.push( contact['id'] );
+			
 			$.each( contact, function( key, value ) {
 				if( typeof( value ) != 'string' && typeof( value ) != 'number' ) return;
 				value = String( value ).toLowerCase();
 				if( ~value.indexOf( search ) ) {
-					matches.push( contact['id'] );
+					matches.push( contact.ldapcontacts_entry_id );
 					return false;
 				}
 			});
@@ -187,11 +186,11 @@ View.prototype = {
 			contacts = [];
 			$.each( tmp, function( i, contact ) {
 				$.each( ids, function( j, key ) {
-					if( key == contact['id'] ) {
+					if( key == contact.ldapcontacts_entry_id ) {
 						// go through all the contacts groups
-						$.each( contact['groups'], function( k, group ) {
+						$.each( contact.groups, function( k, group ) {
 							// check if the contacts has the required group
-							if( self._contacts._activeGroup == group.id ) {
+							if( self._contacts._activeGroup == group.ldapcontacts_entry_id ) {
 								// add the contact
 								contacts.push( contact );
 								// to make the next search faster, we delete the already found id
@@ -225,7 +224,7 @@ View.prototype = {
 
         // load a contact
         $('#app-navigation .contact > a').click(function () {
-            var id = parseInt($(this).parent().data('id'), 10);
+            var id = $(this).parent().data('id');
             self._contacts.load(id);
             self.renderContent();
             $('#info').focus();
@@ -240,7 +239,7 @@ View.prototype = {
 		
 		// load own data for editing
         $('#app-settings a.icon-edit').click(function () {
-            var id = parseInt($(this).parent().data('id'), 10);
+            var id = $(this).parent().data('id');
             self._contacts.load(id);
             self.renderEdit();
             $('#info').focus();

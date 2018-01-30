@@ -13,7 +13,7 @@ style('ldapcontacts', 'tutorial');
 				<li><select id="ldap_contacts_group_selector">
 					<option value="all"><?php p($l->t( "All" ) ); ?></option>
 					{{#each groups}}
-						<option value="{{ id }}">{{ cn }}</option>
+						<option value="{{ ldapcontacts_entry_id }}">{{ ldapcontacts_name }}</option>
 					{{/each}}
 				</select></li>
 			</ul>
@@ -25,8 +25,8 @@ style('ldapcontacts', 'tutorial');
 			<ul>
 				{{#if contacts}}
 					{{#each contacts}}
-						<li class="contact {{#if active}}active{{/if}}"  data-id="{{ id }}">
-							<a href="#">{{ name }}</a>
+						<li class="contact {{#if active}}active{{/if}}"  data-id="{{ ldapcontacts_entry_id }}">
+								<a href="#">{{ ldapcontacts_name }}</a>
 						</li>
 					{{/each}}
 				{{else}}
@@ -45,7 +45,7 @@ style('ldapcontacts', 'tutorial');
 	<div id="app-content">
 		<script id="content-tpl" type="text/x-handlebars-template">
 			{{#if contact}}
-				<h2>{{#if contact.name}}{{ contact.name }}{{/if}}</h2>
+				<h2>{{#if contact.ldapcontacts_name}}{{ contact.ldapcontacts_name }}{{/if}}</h2>
 				<table>
 					<tbody>
                         <?php
@@ -58,7 +58,7 @@ style('ldapcontacts', 'tutorial');
 								<td><?php p($l->t( 'Groups' )); ?></td>
 								<td>
 								{{#each contact.groups}}
-									{{#if cn}}{{ cn }}<br>{{/if}}
+									{{#if ldapcontacts_name}}{{ ldapcontacts_name }}<br>{{/if}}
 								{{/each}}
 								</td>
 								<td></td>

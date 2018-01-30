@@ -50,10 +50,6 @@ $( document ).ready( function() {
             var self = this;
 			// load the statistics
 			$.get( this._baseUrl + '/statistics', function( data ) {
-				
-				console.log( data );
-				
-				
 				if( data.status == "success" ) {
                     delete data.status;
                     // save all data
@@ -68,7 +64,6 @@ $( document ).ready( function() {
 				    deferred.reject();
                 }
 			}).fail( function() {
-				console.log('FAIL');
 				// statistics couldn't be loaded
 				deferred.reject();
 			});

@@ -107,7 +107,7 @@ style( 'ldapcontacts', [ 'settings', 'statistics' ] );
 				<div class="container">
 					{{#each hidden}}
 						<span class="edit-group">
-							<span class="name">{{ cn }}</span><span class="remove" target-id="{{ id }}">X</span>
+							<span class="name">{{ ldapcontacts_name }}</span><span class="remove" target-id="{{ ldapcontacts_entry_id }}">X</span>
 						</span>
 					{{/each}}
 				</div>
@@ -119,7 +119,7 @@ style( 'ldapcontacts', [ 'settings', 'statistics' ] );
 		<br><h3><?php p($l->t('Hidden Groups')); ?></h3><span id="ldapcontacts-edit-group-msg" class="msg"></span>
 		<div id="ldapcontacts-edit-group"><div class="icon-loading"></div></div>
         
-        <h3><?php p($l->t( 'Statistics' )); ?></h3>
+        <br><h3><?php p($l->t( 'Statistics' )); ?></h3>
     
         <script id="ldapcontacts-stat-tpl" type="text/x-handlebars-template">
             <div class="stat">

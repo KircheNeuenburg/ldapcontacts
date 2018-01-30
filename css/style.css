@@ -120,7 +120,7 @@ input[type="search"].searching + .abort {
 	opacity: 0.5;
 	width: 20px;
 	cursor: pointer;
-	margin-right: 7px;
+	margin-right: 12px;
 	margin-top: -10px;
 }
 
