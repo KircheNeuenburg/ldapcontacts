@@ -281,8 +281,9 @@ class ContactController extends Controller {
 			
 			// a contact has to have a name
 			// TODO: check if it might be useful to put a placeholder here if no name is given
-			if( !isset( $result[ $this->user_display_name ] ) || empty( trim( $result[ $this->user_display_name ] ) ) ) continue;
-			$tmp['ldapcontacts_name'] = $result[ $this->user_display_name ];
+			if( !isset( $result[ $this->user_display_name ] ) ) continue;
+			$tmp['ldapcontacts_name'] = is_array( $result[ $this->user_display_name ] ) ? $result[ $this->user_display_name ][0] : $result[ $this->user_display_name ];
+			if( empty( $tmp['ldapcontacts_name'] = trim( $tmp['ldapcontacts_name'] ) ) ) continue;
 			
 			// get the users groups
 			$groups = $this->getGroups( $result[ $user_group_id_attribute ] );
