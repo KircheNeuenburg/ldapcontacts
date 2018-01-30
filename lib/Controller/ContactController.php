@@ -728,14 +728,16 @@ class ContactController extends Controller {
      * amount of entries the users have filled out, in percent
      */
     protected function entriesFilledPercent() {
-        return round( $this->entriesFilled() / $this->entryAmount() * 100, 2 );
+        $amount = $this->entryAmount();
+        return $amount > 0 ? round( $this->entriesFilled() / $amount * 100, 2 ) : 0;
     }
     
     /**
      * amount of entries the users haven't filled out, in percent
      */
     protected function entriesEmptyPercent() {
-        return round( $this->entriesEmpty() / $this->entryAmount() * 100, 2 );
+        $amount = $this->entryAmount();
+        return $amount > 0 ? round( $this->entriesEmpty() / $amount * 100, 2 ) : 0;
     }
     
     /**
@@ -782,14 +784,16 @@ class ContactController extends Controller {
      * how many users have filled at least one of their entries, in percent
      */
     protected function usersFilledEntriesPercent() {
-        return round( $this->usersFilledEntries() / $this->userAmount() * 100, 2 );
+        $amount = $this->userAmount();
+        return $amount > 0 ? round( $this->usersFilledEntries() / $amount * 100, 2 ) : 0;
     }
     
     /**
      * how many users have filled none of their entries, in percent
      */
     protected function usersEmptyEntriesPercent() {
-        return round( $this->usersEmtpyEntries() / $this->userAmount() * 100, 2 );
+        $amount = $this->userAmount();
+        return $amount > 0 ? round( $this->usersEmtpyEntries() / $amount * 100, 2 ) : 0;
     }
 	
 	/**
