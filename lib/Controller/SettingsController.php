@@ -19,15 +19,15 @@ use OCP\AppFramework\Http\DataResponse;
 use OCP\AppFramework\Controller;
 
 class SettingsController extends Controller {
-	private $AppName;
-	private $config;
-	private $uid;
-	private $l;
-	private $array_settings = [ 'user_ldap_attributes' ];
+	protected $AppName;
+	protected $config;
+	protected $uid;
+	protected $l;
+	protected $array_settings = [ 'user_ldap_attributes' ];
     // default values
-    private $default = [];
+    protected $default = [];
 	// default user values
-	private $user_default = [];
+	protected $user_default = [];
 
 	/**
 	 * @param string $AppName
@@ -39,7 +39,7 @@ class SettingsController extends Controller {
 	public function __construct($AppName, IRequest $request, IL10N $l10n, IConfig $config, $UserId ) {
         // check we have a logged in user
 		\OCP\User::checkLoggedIn();
-		parent::__construct($AppName, $request);
+		parent::__construct( $AppName, $request );
 		// set class variables
 		$this->AppName = $AppName;
 		$this->config = $config;
@@ -59,7 +59,7 @@ class SettingsController extends Controller {
         ];
         // set default user values
         $this->user_default = [
-            'order_by' => 'firstname',
+            'order_by' => 'givenname',
             'tutorial_state' => 0,
         ];
 	}
@@ -116,6 +116,19 @@ class SettingsController extends Controller {
         if( !is_bool( $data ) ) {
 			// if this is an array setting, decode it
 			if( in_array( $key, $this->array_settings ) && !is_array( $data ) ) $data = json_decode( $data, true );
+			
+			// special actions for certain settings
+			switch( $key ) {
+				case 'user_group_id_group_attribute':
+					$data = strtolower( $data );
+					break;
+				case 'user_group_id_attribute':
+					$data = strtolower( $data );
+					break;
+				case 'entry_id_attribute':
+					$data = strtolower( $data );
+					break;
+			}
 			
 			// return the data
             if( $DataResponse ) return new DataResponse( [ 'data' => $data, 'status' => 'success' ] );

@@ -222,8 +222,9 @@ class ContactController extends Controller {
 	 * @NoAdminRequired
 	 * 
 	 * @param string $uid
+	 * @param bool $ignore_hidden
 	 */
-	protected function getUsers( $uid=false ) {
+	protected function getUsers( $uid=false, $ignore_hidden=false ) {
 		$entry_id_attribute = $this->settings->getSetting( 'entry_id_attribute', false );
 		$user_group_id_attribute = $this->settings->getSetting( 'user_group_id_attribute', false );
 		
@@ -256,7 +257,7 @@ class ContactController extends Controller {
 		
 		foreach( $results as $i => $result ) {
 			// only hide the user if it isn't requested directly
-			if( !$uid || !isset( $dn ) ) {
+			if( !$ignore_hidden && ( !$uid || !isset( $dn ) ) ) {
 				// check that the user is not hidden
 				$is_hidden = false;
 				foreach( $hidden as $user ) {
@@ -327,8 +328,9 @@ class ContactController extends Controller {
 	 * returns an array of all existing groups or all groups the given user is a member of
 	 * 
 	 * @param string $user_group_id		the id of a user, whos groups should be found
+	 * @param bool $ignore_hidden		show all groups, even the hidden ones
 	 */
-	protected function getGroups( $user_group_id=false ) {
+	protected function getGroups( $user_group_id=false, $ignore_hidden=false ) {
 		// construct the filter
 		$user_group_id_group_attribute = $this->settings->getSetting( 'user_group_id_group_attribute', false );
 		$entry_id_attribute = $this->settings->getSetting( 'entry_id_attribute', false );
@@ -354,7 +356,7 @@ class ContactController extends Controller {
 		foreach( $groups as $id => &$group ) {
 			// if the groups isn't requested specifically, see if it is hidden
 			// only hide the user if it isn't requested directly
-			if( !$user_group_id ) {
+			if( !$ignore_hidden && !$user_group_id ) {
 				// check that the user is not hidden
 				$is_hidden = false;
 				foreach( $hidden as $tmp ) {
@@ -368,7 +370,6 @@ class ContactController extends Controller {
 					continue;
 				}
 			}
-			
 			
 			// add the groups name
 			$group['ldapcontacts_name'] = is_array( $group[ $this->group_display_name ] ) ? $group[ $this->group_display_name ][0] : $group[ $this->group_display_name ];
@@ -410,6 +411,13 @@ class ContactController extends Controller {
 		if( empty( $this->uid ) ) return false;
 		// get the users dn
 		return $this->access->username2dn( $this->uid );
+	}
+	
+	/**
+	 * get the users entry id
+	 */
+	protected function getOwnEntryId() {
+		return $this->getEntryLdapId( $this->get_own_dn() );
 	}
 	
 	/**
