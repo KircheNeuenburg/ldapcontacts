@@ -317,7 +317,7 @@ class ContactController extends Controller {
 	 * @param array $b
 	 */
 	protected function order_ldap_contacts( $a, $b ) {
-		$order_by = $this->config->getUserValue( $this->uid, $this->AppName, 'order_by' );
+		$order_by = $this->settings->getUserValue( 'order_by', false );
 		// check if the arrays can be compared
 		if( !isset( $a[ $order_by ], $b[ $order_by ] ) ) return 1;
 		// compare
