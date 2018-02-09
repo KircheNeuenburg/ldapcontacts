@@ -146,7 +146,7 @@ class ContactController extends Controller {
 	 * @NoCSRFRequired
 	 */
 	public function index() {
-        $params = [];
+        $params = [ 'user_ldap_attributes' => [] ];
         // get the users possible ldap attributes
         if( $user_ldap_attributes = $this->settings->getSetting( 'user_ldap_attributes', false ) ) {
             $params['user_ldap_attributes'] = $user_ldap_attributes;
