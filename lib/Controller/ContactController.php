@@ -13,11 +13,15 @@ namespace OCA\LdapContacts\Controller;
 
 use OCP\IRequest;
 use OCP\IConfig;
-use \OCP\IUserManager;
 use OCP\AppFramework\Http\TemplateResponse;
 use OCP\AppFramework\Http\DataResponse;
 use OCP\AppFramework\Controller;
 use OCA\LdapContacts\Controller\SettingsController;
+use OCA\User_LDAP\User\Manager;
+use OCA\User_LDAP\Helper;
+use OCA\User_LDAP\Mapping\UserMapping;
+use OCA\User_LDAP\Mapping\GroupMapping;
+use OCP\IDBConnection;
 
 class ContactController extends Controller {
 	// LDAP configuration
@@ -28,47 +32,56 @@ class ContactController extends Controller {
 	protected $admin_dn;
 	protected $admin_pwd;
 	protected $user_filter;
-	protected $user_filter_hidden;
 	protected $user_filter_specific;
 	protected $group_filter;
-	protected $group_filter_hidden;
 	protected $group_filter_specific;
 	protected $ldap_version;
-	protected $uname_property;
+	protected $user_display_name;
+	protected $group_display_name;
+	protected $access;
 	// ldap server connection
 	protected $connection = false;
-	protected $mail;
 	// other variables
 	protected $l;
 	protected $config;
 	protected $uid;
+	protected $user_dn;
 	protected $AppName;
     protected $settings;
+	protected $db;
     // values
     protected $contacts_available_attributes;
-    protected $contacts_default_attributes = [ 'mail', 'givenname', 'sn' ];
-    
+    protected $contacts_default_attributes;
+ 	// all available statistics
+ 	protected $statistics = [ 'entries', 'entries_filled', 'entries_empty', 'entries_filled_percent', 'entries_empty_percent', 'users', 'users_filled_entries', 'users_empty_entries', 'users_filled_entries_percent', 'users_empty_entries_percent' ];
+
     /**
 	 * @param string $AppName
 	 * @param IRequest $request
-	 * @param IConfig $config
+	'entries', 'entries_filled', 'entries_empty', 'entries_filled_percent', 'entries_empty_percent', 'users', 'users_filled_entries', 'users_empty_entries', 'users_filled_entries_percent', 'users_empty_entries_percent' ];  * @param IConfig $config
 	 * @param SettingsController $settings
      * @param mixed $UserId
+	 * @param Manager $userManager
+	 * @param Helper $helper
+	 * @param UserMapping $userMapping
+	 * @param GroupMapping $groupMapping
 	 */
-	public function __construct( $AppName, IRequest $request, IConfig $config, SettingsController $settings, $UserId ) {
+	public function __construct( $AppName, IRequest $request, IConfig $config, SettingsController $settings, $UserId, Manager $userManager, Helper $helper, UserMapping $userMapping, GroupMapping $groupMapping, IDBConnection $db ) {
 		// check we have a logged in user
 		\OCP\User::checkLoggedIn();
 		parent::__construct( $AppName, $request );
+		// get database connection
+		$this->db = $db;
         // get the settings controller
         $this->settings = $settings;
-		// load ldap configuration from the user_ldap app
-		$this->load_config();
 		// get the config module for user settings
 		$this->config = $config;
 		// save the apps name
 		$this->AppName = $AppName;
 		// get the current users id
 		$this->uid = $UserId;
+		// load ldap configuration from the user_ldap app
+		$this->load_config( $userManager, $helper, $userMapping, $groupMapping );
 		// connect to the ldap server
 		$this->connection = ldap_connect( $this->host, $this->port );
 		
@@ -76,13 +89,16 @@ class ContactController extends Controller {
 		ldap_set_option( $this->connection, LDAP_OPT_PROTOCOL_VERSION, $this->ldap_version);
 		ldap_bind( $this->connection, $this->admin_dn, $this->admin_pwd );
 		
-		// load the users email adress
-		$this->mail = \OC::$server->getUserSession()->getUser()->getEMailAddress();
 		// load translation files
 		$this->l = \OC::$server->getL10N( 'ldapcontacts' );
         
         // define ldap attributes
         $this->contacts_available_attributes = $this->settings->getSetting( 'user_ldap_attributes', false );
+	// make sure attribtues are given
+	if( !is_array( $this->contacts_available_attributes ) ) $this->contacts_available_attributes = [];
+		
+		// set the ldap attributes that are filled out by default
+		$this->contacts_default_attributes = [ $this->settings->getSetting( 'login_attribute', false ), 'givenname', 'sn' ];
 	}
 	
 	/**
@@ -90,32 +106,37 @@ class ContactController extends Controller {
 	 * 
 	 * @param string $prefix
 	 */
-	private function load_config( $prefix = '' ) {
+	private function load_config( Manager $userManager, Helper $helper, UserMapping $userMapping, GroupMapping $groupMapping, $prefix = '' ) {
 		// load configuration
 		$ldapWrapper = new \OCA\User_LDAP\LDAP();
 		$connection = new \OCA\User_LDAP\Connection( $ldapWrapper );
 		$config = $connection->getConfiguration();
-		// check if this is the correct server of if we have to use a prefix
+		// check if this is the correct server or if we have to use a prefix
 		if( empty( $config['ldap_host'] ) ) {
 			$connection = new \OCA\User_LDAP\Connection( $ldapWrapper, 's01' );
 			$config = $connection->getConfiguration();
 		}
 		
+		// get the users dn
+		$this->access = new \OCA\User_LDAP\Access( $connection, $ldapWrapper, $userManager, $helper );
+		$this->access->setUserMapper( $userMapping );
+		$this->access->setGroupMapper( $groupMapping );
+		
 		// put the needed configuration in the local variables
 		$this->host = $config['ldap_host'];
 		$this->port = $config['ldap_port'];
-		$this->base_dn = $config['ldap_base_users'];
+		$this->base_dn = $config['ldap_base'];
+		$this->user_dn = $config['ldap_base_users'];
 		$this->group_dn = $config['ldap_base_groups'];
 		$this->admin_dn = $config['ldap_dn'];
 		$this->admin_pwd = $config['ldap_agent_password'];
-		$this->user_filter =  '(&' . $config['ldap_userlist_filter'] . '(!(objectClass=shadowAccount)))';
-		$this->user_filter_hidden =  '(&' . $config['ldap_userlist_filter'] . '(objectClass=shadowAccount))';
+		$this->user_filter =  $config['ldap_userlist_filter'];
 		$this->user_filter_specific = $config['ldap_login_filter'];
-		$this->group_filter = '(&' . $config['ldap_group_filter'] . '(!(objectClass=shadowAccount)))';
-		$this->group_filter_hidden =  '(&' . $config['ldap_group_filter'] . '(objectClass=shadowAccount))';
+		$this->group_filter = $config['ldap_group_filter'];
 		$this->group_filter_specific = '(&' . $config['ldap_group_filter'] . '(gidNumber=%gid))';
 		$this->ldap_version = 3;
-		$this->uname_property = 'uid';
+		$this->user_display_name = $config['ldap_display_name'];
+		$this->group_display_name = $config['ldap_group_display_name'];
 	}
 	
 	/**
@@ -125,7 +146,7 @@ class ContactController extends Controller {
 	 * @NoCSRFRequired
 	 */
 	public function index() {
-        $params = [];
+        $params = [ 'user_ldap_attributes' => [] ];
         // get the users possible ldap attributes
         if( $user_ldap_attributes = $this->settings->getSetting( 'user_ldap_attributes', false ) ) {
             $params['user_ldap_attributes'] = $user_ldap_attributes;
@@ -145,7 +166,7 @@ class ContactController extends Controller {
 	 * @NoAdminRequired
 	 */
 	public function load() {
-		return new DataResponse( $this->get_users( $this->user_filter ) );
+		return new DataResponse( $this->getUsers() );
 	}
 	
 	/**
@@ -154,10 +175,8 @@ class ContactController extends Controller {
 	* @NoAdminRequired
 	*/
 	public function show() {
-		// check this user actually has an email
-		if( empty( $this->mail ) ) return new DataResponse( false );
 		// get the users info
-		return new DataResponse( $this->get_users( $this->user_filter , $this->mail ) );
+		return new DataResponse( $this->getUsers( $this->uid ) );
 	}
 	
 	/**
@@ -166,7 +185,7 @@ class ContactController extends Controller {
 	* @NoAdminRequired
 	*/
 	public function groups() {
-		return new DataResponse( $this->get_groups( $this->group_filter ) );
+		return new DataResponse( $this->getGroups() );
 	}
 	
 	/**
@@ -174,39 +193,27 @@ class ContactController extends Controller {
 	* 
 	* @NoAdminRequired
 	*
-	* @param string $givenname
-	* @param string $sn
-	* @param string $street
-	* @param string $postaladdress
-	* @param string $postalcode
-	* @param string $l
-	* @param string $homephone
-	* @param string $mobile
-	* @param string $description
+	* @param string $data		jQuery parsed form
 	*/
-	public function update( $givenname, $sn, $street, $postaladdress, $postalcode, $l, $homephone, $mobile, $description ) {
-		// put all given values in one array
-		$datas = explode( ',', 'givenname,sn,street,postaladdress,postalcode,l,homephone,mobile,description' );
+	public function update( $data ) {
+		// parse given data
+		parse_str( urldecode( $data ), $array );
+
 		$modify = [];
-		
-		foreach( $datas as $data ) {
-			$$data = trim( $$data );
-			// remove entry if exists
-			if( $$data === '' ) {
-				$modify[ $data ] = [];
-			}
-			else {
-				// add or modify entries
-				$modify[ $data ] = $$data;
-			}
+		foreach( $array['user_ldap_attributes'] as $attribute => $value ) {
+			$value = trim( $value );
+			$attribute = str_replace( "'", "", $attribute );
+			
+			// remove, add or modify attribute
+			$modify[ $attribute ] = $value === '' ? [] : $value;
 		}
 		
 		// get own dn
-		if( !$dn = $this->get_own_dn() ) return false;
+		if( !$dn = $this->get_own_dn() ) return new DataResponse( array( 'data' => array( 'message' => $this->l->t( 'Something went wrong while saving your data' ) ), 'status' => 'error' ) );
 		
 		// update given values
-		if( ldap_modify( $this->connection, $dn, $modify ) ) return new DataResponse( 'SUCCESS' );
-		else return new DataResponse( 'ERROR' );
+		if( ldap_modify( $this->connection, $dn, $modify ) ) return new DataResponse( array( 'data' => array( 'message' => $this->l->t( 'Your data has successfully been saved' ) ), 'status' => 'success' ) );
+		else return new DataResponse( array( 'data' => array( 'message' => $this->l->t( 'Something went wrong while saving your data' ) ), 'status' => 'error' ) );
 	}
 	
 	/**
@@ -215,46 +222,77 @@ class ContactController extends Controller {
 	 * @NoAdminRequired
 	 * 
 	 * @param string $uid
-	 * @param string $get_dn
+	 * @param bool $ignore_hidden
 	 */
-	protected function get_users( $user_filter, $uid = false, $get_dn = false ) {
-		if( $uid )
-			$request = ldap_search( $this->connection, $this->base_dn, str_replace( '%uid', $uid, $this->user_filter_specific ));
-		else
-			$request = ldap_search( $this->connection, $this->base_dn, $user_filter );
+	protected function getUsers( $uid=false, $ignore_hidden=false ) {
+		$entry_id_attribute = $this->settings->getSetting( 'entry_id_attribute', false );
+		$user_group_id_attribute = $this->settings->getSetting( 'user_group_id_attribute', false );
+		
+		// get a specific user filter if a specific user is requested
+		if( $uid ) {
+			// get the users dn
+			$dn = $this->access->username2dn( $uid );
+			// if no user was found, abort
+			if( !$dn ) return false;
+			$entry_id = $this->getEntryLdapId( $dn );
+			$user_filter = '(&' . $this->user_filter . '(' . $entry_id_attribute . '=' . ldap_escape( $entry_id ) . '))';
+		}
+		else $user_filter = $this->user_filter;
+		
+		$request = ldap_search( $this->connection, $this->user_dn, $user_filter, [ '*', $entry_id_attribute ] );
+		
+		// if no user was found, abort
+		if( is_bool( $request ) ) return false;
 		
 		$results = ldap_get_entries( $this->connection, $request );
+		
 		unset( $results['count'] );
 		$return = array();
+		$ldap_attributes = array_merge( $this->settings->getSetting( 'user_ldap_attributes', false ), [ $this->user_display_name => '', $user_group_id_attribute => '' ] );
+		// make sure attributes are given
+		if( !is_array( $ldap_attributes ) ) $ldap_attributes = [];
 		
-		$datas = explode( ',', 'mail,givenname,sn,street,postaladdress,postalcode,l,homephone,mobile,description,dn,uid' );
-		
-		$id = 1;
+		// get all hidden users
+		$hidden = $this->adminGetEntryHidden( 'user', false );
 		
 		foreach( $results as $i => $result ) {
+			// only hide the user if it isn't requested directly
+			if( !$ignore_hidden && ( !$uid || !isset( $dn ) ) ) {
+				// check that the user is not hidden
+				$is_hidden = false;
+				foreach( $hidden as $user ) {
+					if( $result[ $entry_id_attribute ] == $user[ $entry_id_attribute ] ) {
+						$is_hidden = true;
+						break;
+					}
+				}
+				if( $is_hidden ) continue;
+			}
+			
 			$tmp = array();
-			foreach( $datas as $data ) {
+			foreach( $ldap_attributes as $attribute => $value ) {
 				// check if the value exists for the user
-				if( isset( $result[ $data ] ) ) {
-					if( is_array( $result[ $data ] ) )
-						$tmp[ $data ] = trim( $result[ $data ][0] );
+				if( isset( $result[ $attribute ] ) ) {
+					if( is_array( $result[ $attribute ] ) )
+						$tmp[ $attribute ] = trim( $result[ $attribute ][0] );
 					else
-						$tmp[ $data ] = trim( $result[ $data ] );
+						$tmp[ $attribute ] = trim( $result[ $attribute ] );
 				}
 			}
 			
-			// combine full name
-			$tmp['name'] = $tmp['givenname'] . ' ' . $tmp['sn'];
-			// a contact has to have a name
-			if( $tmp['name'] === ' ' ) continue;
+			// add the entrys id
+			if( !isset( $result[ $entry_id_attribute ] ) || empty( $result[ $entry_id_attribute ] ) ) continue;
+			$tmp['ldapcontacts_entry_id'] = is_array( $result[ $entry_id_attribute ] ) ? $result[ $entry_id_attribute ][0] : $result[ $entry_id_attribute ];
 			
-			// save the current id
-			$tmp['id'] = $id;
-			// delete dn if not explicitly requested
-			if( !$get_dn ) unset( $tmp['dn'] );
+			// a contact has to have a name
+			// TODO: check if it might be useful to put a placeholder here if no name is given
+			if( !isset( $result[ $this->user_display_name ] ) ) continue;
+			$tmp['ldapcontacts_name'] = is_array( $result[ $this->user_display_name ] ) ? $result[ $this->user_display_name ][0] : $result[ $this->user_display_name ];
+			if( empty( $tmp['ldapcontacts_name'] = trim( $tmp['ldapcontacts_name'] ) ) ) continue;
 			
 			// get the users groups
-			$groups = $this->get_user_groups( $tmp['mail'] );
+			$group_uid_attribute = is_array( $result[ $user_group_id_attribute ] ) ? $result[ $user_group_id_attribute ][0] : $result[ $user_group_id_attribute ];
+			$groups = $this->getGroups( $group_uid_attribute );
 			if( $groups ) $tmp['groups'] = $groups;
 			else $tmp['groups'] = array();
 			
@@ -264,102 +302,88 @@ class ContactController extends Controller {
 			}
 			
 			array_push( $return, $tmp );
-			$id++;
 		}
 		
-		// check if the users should be ordered by firstname or by lastname
-		if( $this->config->getUserValue( $this->uid, $this->AppName, 'order_by' ) === 'lastname' ) {
-			// order the contacts by lastname
-			usort( $return, function( $a, $b ) {
-				if( $a['sn'] === $b['sn'] ) return $a['givenname'] <=> $b['givenname'];
-				else return $a['sn'] <=> $b['sn'];
-			});
-		}
-		else {
-			// order the contacts by firstname
-			usort( $return, function( $a, $b ) {
-				if( $a['givenname'] === $b['givenname'] ) return $a['sn'] <=> $b['sn'];
-				else return $a['givenname'] <=> $b['givenname'];
-			});
-		}
+		// order the users
+		usort( $return, [ $this, 'order_ldap_contacts' ] );
 		
 		return $return;
 	}
-
+				  
 	/**
-	 * returns all the groups the user is a member in
+	 * orders the given user array by the ldap attribute selected by the user
 	 * 
-	 * @param $uid		the users uid
+	 * @param array $a
+	 * @param array $b
 	 */
-	protected function get_user_groups( $uid ) {
-		// get the users username
-		if( !$uname = $this->get_uname( $uid ) ) return false;
-		// construct the filter
-		$filter = '(&' . $this->group_filter . '(memberUid=' . $uname . '))';
-		// search the entries
-		$result = ldap_list($this->connection, $this->group_dn, $filter);
-		$entries = ldap_get_entries($this->connection, $result);
-		
-		// check if request was successful and if so, remove the count variable
-		if( $entries['count'] < 1 ) return array();
-		array_shift( $entries );
-		
-		// output buffer
-		$output = array();
-		// go through all the groups
-		foreach( $entries as $group ) {
-			// check all values are there
-			if( !isset( $group['dn'], $group['cn'][0] ) ) continue;
-			// put the groups values in the buffer
-			$array = array();
-			$array['dn'] = $group['dn'];
-			$array['cn'] = $group['cn'][0];
-			$array['id'] = $group['gidnumber'][0];
-			// write group buffer to output buffer
-			array_push( $output, $array );
-		}
-		
-		// order the groups
-		usort( $output, function( $a, $b ) {
-			return $a['cn'] <=> $b['cn'];
-		});
-		
-		// return the buffer
-		return $output;
+	protected function order_ldap_contacts( $a, $b ) {
+		$order_by = $this->settings->getUserValue( 'order_by', false );
+		// check if the arrays can be compared
+		if( !isset( $a[ $order_by ], $b[ $order_by ] ) ) return 1;
+		// compare
+		return $a[ $order_by ] <=> $b[ $order_by ];
 	}
 	
 	/**
-	 * returns an array of the cn and dn of all existing groups
+	 * returns an array of all existing groups or all groups the given user is a member of
+	 * 
+	 * @param string $user_group_id		the id of a user, whos groups should be found
+	 * @param bool $ignore_hidden		show all groups, even the hidden ones
 	 */
-	protected function get_groups( $group_filter ) {
-		$request = ldap_list( $this->connection, $this->group_dn, $group_filter );
-		$entries = ldap_get_entries($this->connection, $request);
-		// check if request was successful and if so, remove the count variable
-		if( $entries['count'] < 1 ) return array();
-		array_shift( $entries );
+	protected function getGroups( $user_group_id=false, $ignore_hidden=false ) {
+		// construct the filter
+		$user_group_id_group_attribute = $this->settings->getSetting( 'user_group_id_group_attribute', false );
+		$entry_id_attribute = $this->settings->getSetting( 'entry_id_attribute', false );
+		$attributes = [ '*', $entry_id_attribute, $this->group_display_name ];
 		
-		// output buffer
-		$output = array();
+		// if the groups of a given user should be found, use a specific filter
+		if( $user_group_id ) $filter = '(&' . $this->group_filter . '(' . $user_group_id_group_attribute . '=' . $user_group_id . '))';
+		// use the general filter
+		else $filter = $this->group_filter;
+		
+		// fetch all groups from the ldap server
+		$request = ldap_list( $this->connection, $this->group_dn, $filter, $attributes );
+		$groups = ldap_get_entries( $this->connection, $request );
+		
+		// check if request was successful and if so, remove the count variable
+		if( $groups['count'] < 1 ) return [];
+		array_shift( $groups );
+		
+		// get all hidden groups
+		$hidden = $this->adminGetEntryHidden( 'group', false );
+		
 		// go through all the groups
-		foreach( $entries as $group ) {
-			// check all values are there
-			if( !isset( $group['dn'], $group['cn'][0] ) ) continue;
-			// put the groups values in the buffer
-			$array = array();
-			$array['dn'] = $group['dn'];
-			$array['cn'] = $group['cn'][0];
-			$array['id'] = $group['gidnumber'][0];
-			// write group buffer to output buffer
-			array_push( $output, $array );
+		foreach( $groups as $id => &$group ) {
+			// if the groups isn't requested specifically, see if it is hidden
+			// only hide the user if it isn't requested directly
+			if( !$ignore_hidden && !$user_group_id ) {
+				// check that the user is not hidden
+				$is_hidden = false;
+				foreach( $hidden as $tmp ) {
+					if( $group[ $entry_id_attribute ] == $tmp[ $entry_id_attribute ] ) {
+						$is_hidden = true;
+						break;
+					}
+				}
+				if( $is_hidden ) {
+					unset( $groups[ $id ] );
+					continue;
+				}
+			}
+			
+			// add the groups name
+			$group['ldapcontacts_name'] = is_array( $group[ $this->group_display_name ] ) ? $group[ $this->group_display_name ][0] : $group[ $this->group_display_name ];
+			// add the groups id
+			$group['ldapcontacts_entry_id'] = is_array( $group[ $entry_id_attribute ] ) ? $group[ $entry_id_attribute ][0] : $group[ $entry_id_attribute ];
 		}
 		
 		// order the groups
-		usort( $output, function( $a, $b ) {
-			return $a['cn'] <=> $b['cn'];
+		usort( $groups, function( $a, $b ) {
+			return $a['ldapcontacts_name'] <=> $b['ldapcontacts_name'];
 		});
 		
-		// return the buffer
-		return $output;
+		// return the groups
+		return $groups;
 	}
 	
 	/**
@@ -368,205 +392,180 @@ class ContactController extends Controller {
 	 * @param $uid		the users id
 	 */
 	protected function get_uname( $uid ) {
-		$request = ldap_search( $this->connection, $this->base_dn, str_replace( '%uid', $uid, $this->user_filter_specific ), array( $this->uname_property ) );
+		// get the users dn
+		$dn = $this->access->username2dn( $uid );
+		// run a query with the found dn
+		$request = ldap_search( $this->connection, $dn, '(objectClass=*)', array( $this->settings->getSetting( 'user_group_id_attribute', false ) ) );
+		
 		$entries = ldap_get_entries($this->connection, $request);
 		// check if request was successful
 		if( $entries['count'] < 1 ) return false;
-		else return $entries[0][ $this->uname_property ][0];
+		else return $entries[0][ $this->settings->getSetting( 'login_attribute', false ) ][0];
 	}
 	
 	/**
 	 * get the users own dn
 	 */
 	protected function get_own_dn() {
-		// check this user actually has an email
-		if( empty( $this->mail ) ) return false;
-		
-		$user = $this->get_users( $this->user_filter, $this->mail, true );
-		// check if the user has been found
-		if( !isset( $user[0]['dn'] ) || empty( trim( $user[0]['dn'] ) ) ) return false;
-		// extract dn from array and return it
-		return $user[0]['dn'];
+		// check this user actually has a uid
+		if( empty( $this->uid ) ) return false;
+		// get the users dn
+		return $this->access->username2dn( $this->uid );
 	}
 	
 	/**
-	 * hides the given user
-	 * 
-	 * @param string $uid
+	 * get the users entry id
 	 */
-	public function adminHideUser( $uid ) {
-		// let the helper function handle the actual work
-		$return = $this->adminHideUserHelper( $uid );
-		// check if the request was a success or not
-		if( $return ) return new DataResponse( array( 'data' => array( 'message' => $this->l->t( 'User is now hidden' ) ), 'status' => 'success' ) );
-		else return new DataResponse( array( 'data' => array( 'message' => $this->l->t( 'Making user invisible failed' ) ), 'status' => 'error' ) );
+	protected function getOwnEntryId() {
+		return $this->getEntryLdapId( $this->get_own_dn() );
 	}
+	
 	/**
-	 * helper function for $this->adminHideUser( $uid )
+	 * hides the given entry
 	 * 
-	 * @param string $uid
+	 * @param string entry_id
 	 */
-	private function adminHideUserHelper( $uid ) {
-		// get the users objectClasses
-		$request = ldap_search( $this->connection, $this->base_dn, str_replace( '%uid', $uid, $this->user_filter_specific ), array( 'objectClass' ) );
+	public function adminHideEntry( $entry_id, $type ) {
+		// check if the user is already hidden
+		if( $this->userHidden( $entry_id ) ) return true;
+		
+		// hide the user
+		$sql = "INSERT INTO *PREFIX*ldapcontacts_hidden_entries SET entry_id = ?, type = ?";
+		$stmt = $this->db->prepare( $sql );
+		$stmt->bindParam( 1, $entry_id, \PDO::PARAM_STR );
+		$stmt->bindParam( 2, $type, \PDO::PARAM_STR );
+		$stmt->execute();
+		
+		// check for sql errors
+		if( $stmt->errorCode() == '00000' ) return new DataResponse( array( 'data' => array( 'message' => $this->l->t( 'Entry is now hidden' ) ), 'status' => 'success' ) );
+		else return new DataResponse( array( 'data' => array( 'message' => $this->l->t( 'Making entry invisible failed' ) ), 'status' => 'error' ) );
+	}
+	
+	/**
+	 * get an ldap entrys unique id
+	 * 
+	 * @param string $dn
+	 */
+	protected function getEntryLdapId( string $dn ) {
+		// check if a dn is given
+		if( !$dn ) return false;
+		
+		$entry_id_attribute = $this->settings->getSetting( 'entry_id_attribute', false );
+		// fetch the entrys info from the ldap server
+		$request = ldap_search( $this->connection, $dn, '(objectClass=*)', array( $entry_id_attribute ) );
 		$results = ldap_get_entries( $this->connection, $request );
-		// check if something has been found
-		if( !isset( $results['count'], $results[0]['objectclass'], $results[0]['dn'] ) || $results['count'] !== 1 ) return False;
-		// remove the count variable from the object class
-		unset( $results[0]['objectclass']['count'] );
-		$shadowGiven = false;
-		// go through every objectclass and check if it is the shadowAccount attribute is already there
-		foreach( $results[0]['objectclass'] as $i => $class ) {
-			if( $class === "shadowAccount" ) {
-				$shadowGiven = true;
+		// check if an entry was found
+		if( $results['count'] == 0 ) return false;
+		
+		// get the entry id from the ldap info
+		if( is_array( $results[0][ $entry_id_attribute ] ) ) $entry_id = $results[0][ $entry_id_attribute ][0];
+		else $entry_id = $results[0][ $entry_id_attribute ];
+		
+		return $entry_id;
+	}
+	
+	/**
+	 * checks if the given user is already hiden
+	 * 
+	 * @param string $user_id
+	 * 
+	 * @return bool		wether the user is hidden or not
+	 */
+	private function userHidden( $user_id ) {
+		// get all hidden users
+		$hidden = $this->adminGetEntryHidden( 'user', false );
+		// check if the given user is one of them
+		return in_array( $user_id, $hidden );
+	}
+	
+	/**
+	 * shows the given LDAP entry
+	 * 
+	 * @param string entry_id
+	 */
+	public function adminShowEntry( $entry_id ) {
+		$sql = "DELETE FROM *PREFIX*ldapcontacts_hidden_entries WHERE entry_id = ?";
+		$stmt = $this->db->prepare( $sql );
+		$stmt->bindParam( 1, $entry_id, \PDO::PARAM_STR );
+		$stmt->execute();
+		
+		// check for sql errors
+		if( $stmt->errorCode() == '00000' ) return new DataResponse( array( 'data' => array( 'message' => $this->l->t( 'Entry is now visible again' ) ), 'status' => 'success' ) );
+		else return new DataResponse( array( 'data' => array( 'message' => $this->l->t( 'Making entry visible failed' ) ), 'status' => 'error' ) );
+	}
+	
+	/**
+	 * gets all entries of the given type that are hidden
+	 * 
+	 * @param string $type
+	 * @param bool $DataResponse
+	 */
+	public function adminGetEntryHidden( string $type, bool $DataResponse=true ) {
+		$sql = "SELECT entry_id FROM *PREFIX*ldapcontacts_hidden_entries WHERE type = ?";
+		$stmt = $this->db->prepare( $sql );
+		$stmt->bindParam( 1, $type, \PDO::PARAM_STR );
+		$stmt->execute();
+		
+		// check for sql errors
+		if( $stmt->errorCode() != '00000' ) {
+			if( $DataResponse ) return new DataResponse( array( 'data' => array( 'message' => $this->l->t( "Hidden entries couldn't be loaded" ) ), 'status' => 'error' ) );
+			else return false;
+		}
+		
+		// get all hidden entries
+		$tmp = [];
+		while( $hidden = $stmt->fetchColumn() ) {
+			array_push( $tmp, $hidden );
+		}
+		$stmt->closeCursor();
+		
+		// get additional data for each entry
+		$entries = [];
+		foreach( $tmp as $entry ) {
+			array_push( $entries, $this->getLdapEntryById( $entry, $type ) );
+		}
+		
+		// return fetched entries
+		if( $DataResponse ) return new DataResponse( array( 'data' => $entries, 'status' => 'success' ) );
+		else return $entries;
+	}
+	
+	/**
+	 * gets data
+	 * 
+	 * @param string $entry_id
+	 * @param string $type
+	 */
+	protected function getLdapEntryById( string $entry_id, string $type='' ) {
+		$entry_id_attribute = $this->settings->getSetting( 'entry_id_attribute', false );
+		$request = ldap_search( $this->connection, $this->base_dn, '(' . $entry_id_attribute . '=' . ldap_escape( $entry_id ) . ')', [ '*', $entry_id_attribute ] );
+		$entry = ldap_get_entries( $this->connection, $request )[0];
+		
+		// add the entry id
+		$entry[ 'ldapcontacts_entry_id' ] = $entry_id;
+		
+		// add the entrys name
+		switch( $type ) {
+			case 'user':
+				$name = $entry[ $this->user_display_name ];
+				$entry['ldapcontacts_name'] = is_array( $name ) ? $name[0] : $name;
 				break;
-			}
-		}
-		// if the shadowAccount attribute is not given yet, add it
-		if( !$shadowGiven ) array_push( $results[0]['objectclass'], 'shadowAccount' );
-		// save the modified data
-		return ldap_modify( $this->connection, $results[0]['dn'], array( 'objectclass' => $results[0]['objectclass'] ) );
-	}
-	
-	/**
-	 * shows the given user
-	 * 
-	 * @param string $uid
-	 */
-	public function adminShowUser( $uid ) {
-		// let the helper function handle the actual work
-		$return = $this->adminShowUserHelper( $uid );
-		// check if the request was a success or not
-		if( $return ) return new DataResponse( array( 'data' => array( 'message' => $this->l->t( 'User is now visible again' ) ), 'status' => 'success' ) );
-		else return new DataResponse( array( 'data' => array( 'message' => $this->l->t( 'Making user visible failed' ) ), 'status' => 'error' ) );
-	}
-	/**
-	 * helper function for $this->adminShowUser( $uid )
-	 * 
-	 * @param string $uid
-	 */
-	private function adminShowUserHelper( $uid ) {
-		// get the users objectClasses
-		$request = ldap_search( $this->connection, $this->base_dn, str_replace( '%uid', $uid, $this->user_filter_specific ), array( 'objectClass' ) );
-		$results = ldap_get_entries( $this->connection, $request );
-		// check if something has been found
-		if( !isset( $results['count'], $results[0]['objectclass'], $results[0]['dn'] ) || $results['count'] !== 1 ) return False;
-		// remove the count variable from the object class
-		unset( $results[0]['objectclass']['count'] );
-		// go through every objectclass and check if it is the shadowAccount attribute we have to remove
-		foreach( $results[0]['objectclass'] as $i => $class ) {
-			if( $class === "shadowAccount" ) unset( $results[0]['objectclass'][ $i ] );
-		}
-		
-		// reorder array
-		$objectclass = array_values( $results[0]['objectclass'] );
-		// save the modified data
-		return ldap_modify( $this->connection, $results[0]['dn'], array( 'objectclass' => $objectclass ) );
-	}
-	
-	/**
-	 * shows all users that are hidden
-	 */
-	public function adminGetUsersHidden() {
-		return new DataResponse( $this->get_users( $this->user_filter_hidden, false ) );
-	}
-	
-	/**
-	 * hides the given user
-	 * 
-	 * @param string $gid
-	 */
-	public function adminHideGroup( $gid ) {
-		// let the helper function handle the actual work
-		$return = $this->adminHideGroupHelper( $gid );
-		// check if the request was a success or not
-		if( $return ) return new DataResponse( array( 'data' => array( 'message' => $this->l->t( 'Group is now hidden' ) ), 'status' => 'success' ) );
-		else return new DataResponse( array( 'data' => array( 'message' => $this->l->t( 'Making group invisible failed' ) ), 'status' => 'error' ) );
-	}
-	/**
-	 * helper function for $this->adminHideGroup( $gid )
-	 * 
-	 * @param string $gid
-	 */
-	private function adminHideGroupHelper( $gid ) {
-		// get the groups objectClasses
-		$request = ldap_search( $this->connection, $this->group_dn, str_replace( '%gid', $gid, $this->group_filter_specific ), array( 'objectClass', 'uid', 'cn' ) );
-		$results = ldap_get_entries( $this->connection, $request );
-		
-		
-		// check if something has been found
-		if( !isset( $results['count'], $results[0]['objectclass'], $results[0]['dn'], $results[0]['cn'][0] ) || $results['count'] !== 1 ) return False;
-		// remove the count variable from the object class
-		unset( $results[0]['objectclass']['count'] );
-		$shadowGiven = false;
-		// go through every objectclass and check if it is the shadowAccount attribute is already there
-		foreach( $results[0]['objectclass'] as $i => $class ) {
-			if( $class === "shadowAccount" ) {
-				$shadowGiven = true;
+			case 'group':
+				$name = $entry[ $this->group_display_name ];
+				$entry['ldapcontacts_name'] = is_array( $name ) ? $name[0] : $name;
 				break;
-			}
-		}
-		// if the shadowAccount attribute is not given yet, add it
-		if( !$shadowGiven ) array_push( $results[0]['objectclass'], 'shadowAccount' );
-		
-		// if no uid is set yet, we have to add one
-		if( !isset( $results[0]['uid'] ) ) {
-			$uid = 'group' . strtolower( preg_replace('/\s+/', '', $results[0]['cn'][0]) );		// TODO(hornigal): add numbers in the back, if this isn't unique
-			return ldap_modify( $this->connection, $results[0]['dn'], array( 'objectclass' => $results[0]['objectclass'], 'uid' => $uid ) );
 		}
 		
-		// save the modified data
-		return ldap_modify( $this->connection, $results[0]['dn'], array( 'objectclass' => $results[0]['objectclass'] ) );
-	}
-	
-	/**
-	 * shows the given user
-	 */
-	public function adminShowGroup( $gid ) {
-		// let the helper function handle the actual work
-		$return = $this->adminShowGroupHelper( $gid );
-		// check if the request was a success or not
-		if( $return ) return new DataResponse( array( 'data' => array( 'message' => $this->l->t( 'Group is now visible again' ) ), 'status' => 'success' ) );
-		else return new DataResponse( array( 'data' => array( 'message' => $this->l->t( 'Making group visible failed' ) ), 'status' => 'error' ) );
-	}
-	/**
-	 * helper function for $this->adminShowGroup( $gid )
-	 * 
-	 * @param string $gid
-	 */
-	private function adminShowGroupHelper( $gid ) {
-		// get the users objectClasses
-		$request = ldap_search( $this->connection, $this->group_dn, str_replace( '%gid', $gid, $this->group_filter_specific ), array( 'objectClass' ) );
-		$results = ldap_get_entries( $this->connection, $request );
-		// check if something has been found
-		if( !isset( $results['count'], $results[0]['objectclass'], $results[0]['dn'] ) || $results['count'] !== 1 ) return False;
-		// remove the count variable from the object class
-		unset( $results[0]['objectclass']['count'] );
-		// go through every objectclass and check if it is the shadowAccount attribute we have to remove
-		foreach( $results[0]['objectclass'] as $i => $class ) {
-			if( $class === "shadowAccount" ) unset( $results[0]['objectclass'][ $i ] );
-		}
-		// save the modified data
-		return ldap_modify( $this->connection, $results[0]['dn'], array( 'objectclass' => $results[0]['objectclass'], 'uid' => array() ) );
-	}
-	
-	/**
-	 * shows all groups that are hidden
-	 */
-	public function adminGetGroupsHidden() {
-		return new DataResponse( $this->get_groups( $this->group_filter_hidden ) );
+		return $entry;
 	}
     
     /**
      * get all available statistics
      */
     public function getStatistics() {
-        // all available statistics
-        $statistics = [ 'entries', 'entries_filled', 'entries_empty', 'entries_filled_percent', 'entries_empty_percent', 'users', 'users_filled_entries', 'users_empty_entries', 'users_filled_entries_percent', 'users_empty_entries_percent' ];
-        
         // get them all
         $data = [ 'status' => 'success' ];
-        foreach( $statistics as $type ) {
+        foreach( $this->statistics as $type ) {
             // get the statistic
             $stat = $this->getStatistic( $type )->getData();
             // check if something went wrong
@@ -647,7 +646,7 @@ class ContactController extends Controller {
         // get all attributes the users can edit
         $attributes = $this->userNonDefaultAttributes();
         // get all users and their data
-        $users = $this->get_users( $this->user_filter );
+        $users = $this->getUsers();
         // init counter
         $amount = 0;
         
@@ -669,7 +668,7 @@ class ContactController extends Controller {
         // get all attributes the users can edit
         $attributes = $this->userNonDefaultAttributes();
         // get all users and their data
-        $users = $this->get_users( $this->user_filter );
+        $users = $this->getUsers();
         // init counter
         $amount = 0;
         
@@ -714,7 +713,7 @@ class ContactController extends Controller {
      * amount of registered users
      */
     protected function userAmount() {
-        return count( $this->get_users( $this->user_filter ) );
+        return count( $this->getUsers() );
     }
     
     /**
@@ -724,7 +723,7 @@ class ContactController extends Controller {
         // get all attributes the users can edit
         $attributes = $this->userNonDefaultAttributes();
         // get all users and their data
-        $users = $this->get_users( $this->user_filter );
+        $users = $this->getUsers();
         // init counter
         $amount = 0;
         

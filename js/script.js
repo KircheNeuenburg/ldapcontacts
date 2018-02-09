@@ -20,7 +20,7 @@ Contacts.prototype = {
     load: function (id) {
         var self = this;
         this._contacts.forEach(function (contact) {
-            if (contact.id === id) {
+            if (contact.ldapcontacts_entry_id === id) {
                 contact.active = true;
                 self._activeContact = contact;
             } else {
@@ -55,9 +55,9 @@ Contacts.prototype = {
 			// do special actions on every contact
 			$.each( contacts, function( i, contact ) {
 				// add the general group to all contacts
-				contacts[i].groups.push( {id: 'all'} );
+				contacts[i].groups.push( { ldapcontacts_entry_id: 'all' } );
 				// add all contact ids to the match
-				self._matches.push( contact.id );
+				self._matches.push( contact.ldapcontacts_entry_id );
 			});
 			
             self._contacts = contacts;
@@ -77,16 +77,15 @@ Contacts.prototype = {
 		search = search.toLowerCase();
 		
 		var matches = [];
-		var ids = [];
 		
 		$( this._contacts ).each( function( i, contact ) {
 			if( self._search_id != id ) return false;
-			ids.push( contact['id'] );
+			
 			$.each( contact, function( key, value ) {
 				if( typeof( value ) != 'string' && typeof( value ) != 'number' ) return;
 				value = String( value ).toLowerCase();
 				if( ~value.indexOf( search ) ) {
-					matches.push( contact['id'] );
+					matches.push( contact.ldapcontacts_entry_id );
 					return false;
 				}
 			});
@@ -110,35 +109,17 @@ Contacts.prototype = {
 		if( typeof( this._me ) != 'object' || this._me == null ) return
 		return this._me[0];
 	},
-	updateOwn: function(givenname, sn, street, postaladdress, postalcode, l, homephone, mobile, description) {
-		var own = Object();
-		// save all the given values
-		own.givenname = givenname;
-		own.sn = sn;
-		own.street = street;
-		own.postaladdress = postaladdress;
-		own.postalcode = postalcode;
-		own.l = l;
-		own.homephone = homephone;
-		own.mobile = mobile;
-		own.description = description;
-		
-        return $.ajax({
-            url: this._baseUrl + '/own',
-            method: 'POST',
-            contentType: 'application/json',
-            data: JSON.stringify(own)
-        });
-    },
 	loadGroups: function() {
 		var deferred = $.Deferred();
         var self = this;
+		
         $.get(this._baseUrl + "/groups").done(function (groups) {
             self._groups = groups;
             deferred.resolve();
         }).fail(function () {
             deferred.reject();
         });
+		
         return deferred.promise();
 	}
 };
@@ -205,11 +186,11 @@ View.prototype = {
 			contacts = [];
 			$.each( tmp, function( i, contact ) {
 				$.each( ids, function( j, key ) {
-					if( key == contact['id'] ) {
+					if( key == contact.ldapcontacts_entry_id ) {
 						// go through all the contacts groups
-						$.each( contact['groups'], function( k, group ) {
+						$.each( contact.groups, function( k, group ) {
 							// check if the contacts has the required group
-							if( self._contacts._activeGroup == group.id ) {
+							if( self._contacts._activeGroup == group.ldapcontacts_entry_id ) {
 								// add the contact
 								contacts.push( contact );
 								// to make the next search faster, we delete the already found id
@@ -243,7 +224,7 @@ View.prototype = {
 
         // load a contact
         $('#app-navigation .contact > a').click(function () {
-            var id = parseInt($(this).parent().data('id'), 10);
+            var id = $(this).parent().data('id');
             self._contacts.load(id);
             self.renderContent();
             $('#info').focus();
@@ -258,7 +239,7 @@ View.prototype = {
 		
 		// load own data for editing
         $('#app-settings a.icon-edit').click(function () {
-            var id = parseInt($(this).parent().data('id'), 10);
+            var id = $(this).parent().data('id');
             self._contacts.load(id);
             self.renderEdit();
             $('#info').focus();
@@ -311,7 +292,7 @@ View.prototype = {
 		
 		var source = $('#content-edit-tpl').html();
 		var template = Handlebars.compile(source);
-		var html = template( { me: self._contacts.getOwn(), saved: saved, save_failed: save_failed, edit_login_url: self._settings['edit_login_url'], login_attribute: self._settings['login_attribute'] } );
+		var html = template( { me: self._contacts.getOwn(), saved: saved, save_failed: save_failed, edit_login_url: self._settings['edit_login_url'] } );
 		
 		$('#info').html(html);
 		
@@ -331,18 +312,17 @@ View.prototype = {
 			this.disabled = true;
 			$( this ).after( $( document.createElement( "span" ) ).addClass( "icon-loading" ) );
 			
-			var givenname_val = givenname.val();
-			var sn_val = sn.val();
-			var street_val = street.val();
-			var postaladdress_val = postaladdress.val();
-			var postalcode_val = postalcode.val();
-			var l_val = l.val();
-			var homephone_val = homephone.val();
-			var mobile_val = mobile.val();
-			var description_val = description.val();
+			var data = {};
+			data.data = jQuery( '#edit_own' ).serialize();
 			
-			self._contacts.updateOwn(givenname_val, sn_val, street_val, postaladdress_val, postalcode_val, l_val, homephone_val, mobile_val, description_val).done(function (data) {
-				if( data == "SUCCESS" ) {
+			// update own data
+			return $.ajax({
+				url: self._baseUrl + '/own',
+				method: 'POST',
+				contentType: 'application/json',
+				data: JSON.stringify( data )
+			}).done(function (data) {
+				if( data.status == "success" ) {
 					self._contacts.loadAll().done(function() {
 						self._contacts.loadOwn().done(function() {
 							self.renderNavigation();

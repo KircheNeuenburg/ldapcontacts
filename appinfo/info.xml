@@ -2,8 +2,20 @@
 <info xmlns:xsi= "http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://apps.nextcloud.com/schema/apps/info.xsd">
     <id>ldapcontacts</id>
     <name lang="en">LDAP Contacts</name>
-    <description lang="en">Display your LDAP contacts</description>
-    <version>1.0.2</version>
+    <summary lang="en">Display your LDAP contacts</summary>
+	<description><![CDATA[# LdapContacts
+View other LDAP users as contacts in Nextcloud and see the personal data they shared.
+
+### Features
+  * view all LDAP users as contacts
+  * search these users
+  * restrict your search to certain LDAP groups
+  * hide certain users and groups from the contacts app
+  * define which LDAP attributes are available for your contacts
+
+### Requirements
+  * active LDAP authentification (check [Nextcloud admin manual](https://docs.nextcloud.com/server/13/admin_manual/configuration_user/user_auth_ldap.html) for details)]]></description>
+    <version>1.1.0</version>
     <licence>AGPL</licence>
     <author mail="alexander@h-software.de" homepage="https://h-software.de">Alexander Hornig</author>
     <namespace>LdapContacts</namespace>
@@ -24,7 +36,7 @@
 	
     <dependencies>
         <user_ldap/>
-        <nextcloud min-version="11" max-version="12"/>
+        <nextcloud min-version="11" max-version="13"/>
     </dependencies>
 	
 	<settings>

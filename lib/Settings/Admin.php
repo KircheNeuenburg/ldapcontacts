@@ -13,8 +13,9 @@ namespace OCA\LdapContacts\Settings;
 
 use OCP\AppFramework\Http\TemplateResponse;
 use OCP\Settings\ISettings;
+use OCA\LdapContacts\Controller\ContactController;
 
-Class Admin implements ISettings {
+class Admin implements ISettings {
 	/**
 	 * @return TemplateResponse
 	 */

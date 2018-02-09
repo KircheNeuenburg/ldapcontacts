@@ -4,6 +4,7 @@ $(document).ready(function(){
 		var data = Object();
 		data.key = key;
 		data.value = value;
+		
 		// start saving
 		OC.msg.startSaving( '#ldapcontacts-msg' );
 		// save the settings
@@ -17,11 +18,7 @@ $(document).ready(function(){
 		});
 	}
 	
-	$( '#ldapcontacts-order-by-firstname' ).change( function() {
-		saveSettings( 'order_by', 'firstname' );
-	});
-	
-	$( '#ldapcontacts-order-by-lastname' ).change( function() {
-		saveSettings( 'order_by', 'lastname' );
+	$( '#ldapcontacts-order-by' ).change( function() {
+		saveSettings( 'order_by', this.selectedOptions[0].value );
 	});
 });
