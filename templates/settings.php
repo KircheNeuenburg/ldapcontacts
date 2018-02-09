@@ -74,7 +74,7 @@ style( 'ldapcontacts', [ 'settings', 'statistics' ] );
 		<!-- show and hide users section -->
 		<script id="ldapcontacts-edit-user-tpl" type="text/x-handlebars-template">
 			<div class="search-container">
-				<span class="search"><input type="search" id="ldapcontacts-search-visible" placeholder="<?php p($l->t('hide user')); ?>"><span class="abort"></span></span>
+				<span class="search"><input type="search" id="ldapcontacts-search-visible" placeholder="<?php p($l->t('Hide User')); ?>"><span class="abort"></span></span>
 				<div class="search-suggestions"></div>
 			</div>
 			
@@ -99,7 +99,7 @@ style( 'ldapcontacts', [ 'settings', 'statistics' ] );
 		<!-- show and hide groups section -->
 		<script id="ldapcontacts-edit-group-tpl" type="text/x-handlebars-template">
 			<div class="search-container">
-				<span class="search"><input type="search" id="ldapcontacts-search-groups-visible" placeholder="<?php p($l->t('hide group')); ?>"><span class="abort"></span></span>
+				<span class="search"><input type="search" id="ldapcontacts-search-groups-visible" placeholder="<?php p($l->t('Hide Group')); ?>"><span class="abort"></span></span>
 				<div class="search-suggestions"></div>
 			</div>
 			
