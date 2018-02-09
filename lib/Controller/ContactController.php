@@ -261,7 +261,7 @@ class ContactController extends Controller {
 				// check that the user is not hidden
 				$is_hidden = false;
 				foreach( $hidden as $user ) {
-					if( $result[ $entry_id_attribute ] == $user[ $entry_id_attribute ] ) {
+					if( $result[ $entry_id_attribute ] === $user[ $entry_id_attribute ] ) {
 						$is_hidden = true;
 						break;
 					}
@@ -360,7 +360,7 @@ class ContactController extends Controller {
 				// check that the user is not hidden
 				$is_hidden = false;
 				foreach( $hidden as $tmp ) {
-					if( $group[ $entry_id_attribute ] == $tmp[ $entry_id_attribute ] ) {
+					if( $group[ $entry_id_attribute ] === $tmp[ $entry_id_attribute ] ) {
 						$is_hidden = true;
 						break;
 					}
@@ -430,14 +430,14 @@ class ContactController extends Controller {
 		if( $this->userHidden( $entry_id ) ) return true;
 		
 		// hide the user
-		$sql = "INSERT INTO *PREFIX*ldapcontacts_hidden_entries SET entry_id = ?, type = ?";
+		$sql = "INSERT INTO *PREFIX*ldapcontacts_hidden SET entry_id = ?, type = ?";
 		$stmt = $this->db->prepare( $sql );
 		$stmt->bindParam( 1, $entry_id, \PDO::PARAM_STR );
 		$stmt->bindParam( 2, $type, \PDO::PARAM_STR );
 		$stmt->execute();
 		
 		// check for sql errors
-		if( $stmt->errorCode() == '00000' ) return new DataResponse( array( 'data' => array( 'message' => $this->l->t( 'Entry is now hidden' ) ), 'status' => 'success' ) );
+		if( $stmt->errorCode() === '00000' ) return new DataResponse( array( 'data' => array( 'message' => $this->l->t( 'Entry is now hidden' ) ), 'status' => 'success' ) );
 		else return new DataResponse( array( 'data' => array( 'message' => $this->l->t( 'Making entry invisible failed' ) ), 'status' => 'error' ) );
 	}
 	
@@ -455,7 +455,7 @@ class ContactController extends Controller {
 		$request = ldap_search( $this->connection, $dn, '(objectClass=*)', array( $entry_id_attribute ) );
 		$results = ldap_get_entries( $this->connection, $request );
 		// check if an entry was found
-		if( $results['count'] == 0 ) return false;
+		if( $results['count'] === 0 ) return false;
 		
 		// get the entry id from the ldap info
 		if( is_array( $results[0][ $entry_id_attribute ] ) ) $entry_id = $results[0][ $entry_id_attribute ][0];
@@ -484,13 +484,13 @@ class ContactController extends Controller {
 	 * @param string entry_id
 	 */
 	public function adminShowEntry( $entry_id ) {
-		$sql = "DELETE FROM *PREFIX*ldapcontacts_hidden_entries WHERE entry_id = ?";
+		$sql = "DELETE FROM *PREFIX*ldapcontacts_hidden WHERE entry_id = ?";
 		$stmt = $this->db->prepare( $sql );
 		$stmt->bindParam( 1, $entry_id, \PDO::PARAM_STR );
 		$stmt->execute();
 		
 		// check for sql errors
-		if( $stmt->errorCode() == '00000' ) return new DataResponse( array( 'data' => array( 'message' => $this->l->t( 'Entry is now visible again' ) ), 'status' => 'success' ) );
+		if( $stmt->errorCode() === '00000' ) return new DataResponse( array( 'data' => array( 'message' => $this->l->t( 'Entry is now visible again' ) ), 'status' => 'success' ) );
 		else return new DataResponse( array( 'data' => array( 'message' => $this->l->t( 'Making entry visible failed' ) ), 'status' => 'error' ) );
 	}
 	
@@ -501,13 +501,13 @@ class ContactController extends Controller {
 	 * @param bool $DataResponse
 	 */
 	public function adminGetEntryHidden( string $type, bool $DataResponse=true ) {
-		$sql = "SELECT entry_id FROM *PREFIX*ldapcontacts_hidden_entries WHERE type = ?";
+		$sql = "SELECT entry_id FROM *PREFIX*ldapcontacts_hidden WHERE type = ?";
 		$stmt = $this->db->prepare( $sql );
 		$stmt->bindParam( 1, $type, \PDO::PARAM_STR );
 		$stmt->execute();
 		
 		// check for sql errors
-		if( $stmt->errorCode() != '00000' ) {
+		if( $stmt->errorCode() !== '00000' ) {
 			if( $DataResponse ) return new DataResponse( array( 'data' => array( 'message' => $this->l->t( "Hidden entries couldn't be loaded" ) ), 'status' => 'error' ) );
 			else return false;
 		}

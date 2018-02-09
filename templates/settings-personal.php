@@ -10,7 +10,7 @@ script( 'ldapcontacts', 'settings-personal' );
 			<option></option>
 			<?php
 			foreach( $_['user_ldap_attributes'] as $attribute => $label ) {
-				?><option value="<?php p( $attribute ); ?>" <?php if( $attribute == $_['order_by'] ) echo ' selected'; ?>><?php p( $label ); ?></option><?php
+				?><option value="<?php p( $attribute ); ?>" <?php if( $attribute === $_['order_by'] ) echo ' selected'; ?>><?php p( $label ); ?></option><?php
 			}
 			?>
 		</select>

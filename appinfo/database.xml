@@ -6,7 +6,7 @@
 	<charset>utf8</charset>
 	
 	<table>
-		<name>*dbprefix*ldapcontacts_hidden_entries</name>
+		<name>*dbprefix*ldapcontacts_hidden</name>
 		<declaration>
 			<field>
 				<name>id</name>

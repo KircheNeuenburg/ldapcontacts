@@ -177,7 +177,7 @@ class SettingsController extends Controller {
 		if( !isset( $this->default[ $key ] ) ) return false;
 		
 		/** special processing for certain settings **/
-		if( $key == 'user_ldap_attributes' ) {
+		if( $key === 'user_ldap_attributes' ) {
 			$array = [];
 			// go through every attribute
 			foreach( $value as $attr ) {
