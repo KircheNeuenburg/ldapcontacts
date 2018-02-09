@@ -117,8 +117,13 @@ class ContactController extends Controller {
 			$config = $connection->getConfiguration();
 		}
 		
-		// get the users dn
-		$this->access = new \OCA\User_LDAP\Access( $connection, $ldapWrapper, $userManager, $helper );
+		// check which constructor to use
+		try {
+			$this->access = new \OCA\User_LDAP\Access( $connection, $ldapWrapper, $userManager, $helper );
+		}
+		catch( \ArgumentCountError $e ) {
+			$this->access = new \OCA\User_LDAP\Access( $connection, $ldapWrapper, $userManager, $helper, $this->config );
+		}
 		$this->access->setUserMapper( $userMapping );
 		$this->access->setGroupMapper( $groupMapping );
 		

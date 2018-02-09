@@ -35,6 +35,17 @@
 #app-navigation {
 	position: relative;
 }
+
+#app-navigation a {
+    display: block;
+    line-height: 44px;
+    padding: 0 12px;
+}
+
+#app-navigation a.icon-edit {
+	padding-left: 40px;
+}
+
 #app-navigation > #navigation-header {
 	height: 100px;
 	border-bottom: 1px solid #eee;
@@ -137,6 +148,9 @@ input[type="search"].searching + .abort:hover, input[type="search"].searching + 
 
 .icon-edit {
 	background-image: url("../img/edit.svg?v=1");
+	background-size: 20px;
+	padding-left: 40px;
+	background-position-x: 15px;
 }
 
 .icon-copy {
