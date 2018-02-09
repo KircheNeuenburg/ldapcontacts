@@ -447,6 +447,9 @@ class ContactController extends Controller {
 	 * @param string $dn
 	 */
 	protected function getEntryLdapId( string $dn ) {
+		// check if a dn is given
+		if( !$dn ) return false;
+		
 		$entry_id_attribute = $this->settings->getSetting( 'entry_id_attribute', false );
 		// fetch the entrys info from the ldap server
 		$request = ldap_search( $this->connection, $dn, '(objectClass=*)', array( $entry_id_attribute ) );
