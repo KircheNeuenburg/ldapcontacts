@@ -230,7 +230,7 @@ $(document).ready(function(){
             });
         },
 		// renders the settings for showing and hiding users
-		renderUser: function() {console.log(this.getHidden());
+		renderUser: function() {
 			var self = this;
 			var source = $('#ldapcontacts-edit-user-tpl').html();
 			var template = Handlebars.compile(source);

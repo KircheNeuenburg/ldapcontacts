@@ -58,7 +58,7 @@ class ContactController extends Controller {
     /**
 	 * @param string $AppName
 	 * @param IRequest $request
-	'entries', 'entries_filled', 'entries_empty', 'entries_filled_percent', 'entries_empty_percent', 'users', 'users_filled_entries', 'users_empty_entries', 'users_filled_entries_percent', 'users_empty_entries_percent' ];  * @param IConfig $config
+	 * @param IConfig $config
 	 * @param SettingsController $settings
      * @param mixed $UserId
 	 * @param Manager $userManager
