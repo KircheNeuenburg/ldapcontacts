@@ -58,7 +58,7 @@ class ContactController extends Controller {
     /**
 	 * @param string $AppName
 	 * @param IRequest $request
-	'entries', 'entries_filled', 'entries_empty', 'entries_filled_percent', 'entries_empty_percent', 'users', 'users_filled_entries', 'users_empty_entries', 'users_filled_entries_percent', 'users_empty_entries_percent' ];  * @param IConfig $config
+	 * @param IConfig $config
 	 * @param SettingsController $settings
      * @param mixed $UserId
 	 * @param Manager $userManager
@@ -248,7 +248,10 @@ class ContactController extends Controller {
 		}
 		else $user_filter = $this->user_filter;
 		
-		$request = ldap_search( $this->connection, $this->user_dn, $user_filter, [ '*', $entry_id_attribute ] );
+		// check if users are identifyed by dn
+		if( $uid && $entry_id_attribute === 'dn' ) $request = ldap_search( $this->connection, $entry_id, '(objectclass=*)' );
+		// search by attribute
+		else $request = ldap_search( $this->connection, $this->user_dn, $user_filter, [ '*', $entry_id_attribute ] );
 		
 		// if no user was found, abort
 		if( is_bool( $request ) ) return false;
@@ -547,7 +550,15 @@ class ContactController extends Controller {
 	 */
 	protected function getLdapEntryById( string $entry_id, string $type='' ) {
 		$entry_id_attribute = $this->settings->getSetting( 'entry_id_attribute', false );
-		$request = ldap_search( $this->connection, $this->base_dn, '(' . $entry_id_attribute . '=' . ldap_escape( $entry_id ) . ')', [ '*', $entry_id_attribute ] );
+		// check if users are identifyed by dn
+		if( $entry_id_attribute === 'dn' ) {
+			$request = ldap_search( $this->connection, $entry_id, '(objectclass=*)' );
+		}
+		// search by attribute
+		else {
+			$request = ldap_search( $this->connection, $this->base_dn, '(' . $entry_id_attribute . '=' . ldap_escape( $entry_id ) . ')', [ '*', $entry_id_attribute ] );
+		}
+		
 		$entry = ldap_get_entries( $this->connection, $request )[0];
 		
 		// add the entry id

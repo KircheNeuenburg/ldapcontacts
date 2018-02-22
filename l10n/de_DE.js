@@ -63,6 +63,7 @@ OC.L10N.register(
 	"Users with some filled entries" : "Benutzer mit ein paar ausgefüllten Einträgen",
 	"Users with only empty entries" : "Benutzer mit nur leeren Einträgen",
 	"Entries filled" : "Ausgefüllte Einträge",
-	"Users with filled entries" : "Benutzer mit ausgefüllten Einträgen"
+	"Users with filled entries" : "Benutzer mit ausgefüllten Einträgen",
+	"Unique LDAP Entry Identifier" : "Einzigartige LDAP Eintrag Identifizierung"
 },
 "nplurals=2; plural=(n != 1);");
