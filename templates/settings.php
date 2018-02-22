@@ -28,6 +28,10 @@ style( 'ldapcontacts', [ 'settings', 'statistics' ] );
                         <td><label for="ldapcontacts_form_edit_login_url"><?php p($l->t( 'Edit Login URL' )); ?></label></td>
                         <td><input type="url" id="ldapcontacts_form_edit_login_url" name="edit_login_url" placeholder="<?php p($l->t( 'URL' )); ?>" value="{{ settings.edit_login_url }}"></td>
                     </tr>
+                    <tr>
+                        <td><label for="ldapcontacts_form_entry_id_attribute"><?php p($l->t( 'Unique LDAP Entry Identifier' )); ?></label></td>
+                        <td><input type="text" id="ldapcontacts_form_entry_id_attribute" name="entry_id_attribute" placeholder="<?php p($l->t( 'Unique LDAP Entry Identifier' )); ?>" value="{{ settings.entry_id_attribute }}"></td>
+                    </tr>
                 </tbody>
             </table>
 			
