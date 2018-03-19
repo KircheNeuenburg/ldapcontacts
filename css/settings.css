@@ -27,6 +27,10 @@
 	margin: 10px 50px 10px 10px;
 }
 
+#ldapcontacts table.inline + *:not(.inline) {
+	clear: left;
+}
+
 #ldapcontacts input[type="text"], #ldapcontacts input[type="url"], #ldapcontacts input[type="email"], #ldapcontacts textarea {
 	width: 100%;
 }
