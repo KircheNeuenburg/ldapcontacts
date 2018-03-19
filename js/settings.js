@@ -77,7 +77,6 @@ $(document).ready(function(){
 					self._ldap_search_previews = [];
 					// replace escaped data
 					$.each( data.data, function( i, v ) {
-						console.log( i + ' - ' + v );
 						self._ldap_search_previews[ i ] = v.replace( '\\23\\55\\53\\45\\52\\23', 'AA00BB' ).replace( '\\23\\41\\41\\30\\30\\42\\42\\23', 'USER' );
 					});
 					
@@ -234,8 +233,8 @@ $(document).ready(function(){
 				$( '#ldapcontacts-general-settings .ldap-attributes' ).children( 'tbody' ).append( html );
 			});
 			
-            // save settings button
-            $( "#ldapcontacts-general-settings input" ).on( 'change', function( e ) {
+            // save settings
+            $( "#ldapcontacts-general-settings input:not(.ignore-change)" ).on( 'change', function( e ) {
 				e.preventDefault();
 				// get the settings from the form
 				var settings = $( '#ldapcontacts-general-settings-form' ).serialize();
@@ -253,11 +252,79 @@ $(document).ready(function(){
                     });
                     OC.msg.finishedSaving( '#ldapcontacts .ldapcontacts-settings-msg', data );
                 }).fail( function() {
-                    // if the saving failed, reactivate the save button
+                    // if the saving failed, reactivate the save
                     self.renderSettings();
                 });
             });
+			
+			self.registerTestButton();
         },
+		// register the test settings button
+		registerTestButton: function() {
+			var self = this;
+			// test settings button
+			$( '#ldapcontacts-test-settings button[target="all"]' ).click( function( e ) {
+				e.preventDefault();
+				var uid = $( '#ldapcontacts-test-settings-uid' ).val();
+				// show loading icon
+				$( this.parentElement ).html( '<span class="icon-loading"></span>' );
+				self.testSettings( uid );
+			});
+		},
+		// test the LDAP settings
+		testSettings: function( uid ) {
+			var self = this;
+			var tests = {
+				users: -1,
+				user_specific: -1,
+				groups: -1,
+				user_groups: -1,
+			};
+			
+			// count all users
+			var users = $.get( self._baseUrl + '/test/users/0' ).done( function( data ) {
+				if( data.status == 'success' ) {
+					tests.users = data.data.length;
+				}
+			});
+			
+			// check if a specific user is given for testing
+			if( typeof( uid ) != 'undefined' && uid != null && uid != '' ) {
+				// get a specific user
+				var user_specific = $.get( self._baseUrl + '/test/user/' + encodeURI( uid ) ).done( function( data ) {
+					if( data.status == 'success' && data.data.length == 1 ) {
+						tests.user_specific = 1;
+						tests.user_groups = data.data[0].groups.length;
+					}
+				});
+			}
+			else {
+				var user_specific = $.Deferred().resolve();
+			}
+			
+			// count all groups
+			var groups = $.get( self._baseUrl + '/test/groups/0' ).done( function( data ) {
+				if( data.status == 'success' ) {
+					tests.groups = data.data.length;
+				}
+			});
+			
+			// render test results when done with all tests
+			$.when( users, user_specific, groups ).then( function( users, users_specific, groups ) {
+				// remove failed tests
+				$.each( tests, function( i, v ) {
+					if( v == -1 ) delete tests[ i ];
+				});
+				
+				// render test results
+				var source = $( '#ldapcontacts-test-settings-tpl' ).html();
+				var template = Handlebars.compile( source );
+				var html = template( { tests: tests } );
+				$( '#ldapcontacts-test-settings' ).html( html );
+				// register new test button
+				self.registerTestButton();
+			});
+		},
 		// renders the settings for showing and hiding users
 		renderUser: function() {
 			var self = this;

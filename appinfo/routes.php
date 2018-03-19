@@ -32,6 +32,7 @@ return [
 	   [ 'name' => 'contact#adminHideEntry', 'url' => '/admin/hide/{type}/{entry_id}', 'verb' => 'GET' ],
 	   [ 'name' => 'contact#adminGetEntryHidden', 'url' => '/admin/hidden/{type}', 'verb' => 'GET' ],
 	   [ 'name' => 'contact#searchFilterPreviews', 'url' => '/searchfilter/previews', 'verb' => 'GET' ],
+	   [ 'name' => 'contact#testSettings', 'url' => '/test/{type}/{var}', 'verb' => 'GET' ],
 	   [ 'name' => 'contact#getStatistic', 'url' => '/statistic/{type}', 'verb' => 'GET' ],
 	   [ 'name' => 'contact#getStatistics', 'url' => '/statistics', 'verb' => 'GET' ],
 	   [ 'name' => 'settings#setUserValue', 'url' => '/settings/personal', 'verb' => 'POST' ],
