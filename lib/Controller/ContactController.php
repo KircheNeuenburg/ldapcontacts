@@ -831,7 +831,7 @@ class ContactController extends Controller {
 				'user' => $this->getEntryFilter( 'user' ),
 				'user_specific' => $this->getEntryFilter( 'user', '#USER#' ),
 				'group' => $this->getEntryFilter( 'group' ),
-				'group_specific' => $this->getEntryFilter( 'group', '#USER#' ),
+				'group_specific' => $this->getEntryFilter( 'group', '#AA00BB#' ),
 			],
 		] );
 	}

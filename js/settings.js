@@ -78,7 +78,7 @@ $(document).ready(function(){
 					// replace escaped data
 					$.each( data.data, function( i, v ) {
 						console.log( i + ' - ' + v );
-						self._ldap_search_previews[ i ] = v.replace( '\\23\\55\\53\\45\\52\\23', 'USER' );
+						self._ldap_search_previews[ i ] = v.replace( '\\23\\55\\53\\45\\52\\23', 'AA00BB' ).replace( '\\23\\41\\41\\30\\30\\42\\42\\23', 'USER' );
 					});
 					
 					deferred.resolve();

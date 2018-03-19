@@ -38,6 +38,27 @@ style( 'ldapcontacts', [ 'settings', 'statistics' ] );
 			<span class="msg ldapcontacts-settings-msg"></span><br>
 			
 			<br><h3><?php p($l->t( 'LDAP search filter preview' )); ?></h3><br>
+			
+			<table class="inline">
+				<thead>
+					<tr><th colspan="2"><?php p($l->t( 'Example of an LDAP user' )); ?></th></tr>
+				</thead>
+				<tbody>
+					<tr><th>objectclass</td><td>inetOrgPerson</th></tr>
+					<tr><th>{{ settings.entry_id_attribute }}</th><td>AA00BB</td></tr>
+					<tr><th>{{ settings.user_group_id_attribute }}</th><td>USER</td></tr>
+				</tbody>
+			</table>
+			<table class="inline">
+				<thead>
+					<tr><th colspan="2"><?php p($l->t( 'Example of an LDAP group' )); ?></th></tr>
+				</thead>
+				<tbody>
+					<tr><th>objectclass</th><td>posixGroup</td></tr>
+					<tr><th>{{ settings.entry_id_attribute }}</th><td>BB00CC</td>
+				</tbody>
+			</table>
+			
 			<table>
                 <tbody>
                     <tr>

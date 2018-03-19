@@ -14,8 +14,17 @@
 	border-radius: 10px;
 }
 
-#ldapcontacts table tr td {
+#ldapcontacts table tr th {
+	font-weight: bold;
+}
+
+#ldapcontacts table tr th, #ldapcontacts table tr td {
 	padding-right: 10px;
+}
+
+#ldapcontacts table.inline {
+	float: left;
+	margin: 10px 50px 10px 10px;
 }
 
 #ldapcontacts input[type="text"], #ldapcontacts input[type="url"], #ldapcontacts input[type="email"], #ldapcontacts textarea {
