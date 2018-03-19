@@ -85,7 +85,8 @@ style( 'ldapcontacts', [ 'settings', 'statistics' ] );
 			<br><h3><?php p($l->t( 'Test Settings' )); ?></h3><br>
 			
 			<div id="ldapcontacts-test-settings">
-				<input type="text" id="ldapcontacts-test-settings-uid" class="ignore-change" placeholder="<?php p($l->t( 'Test Username' )); ?>">
+				<input type="text" id="ldapcontacts-test-settings-uid" class="ignore-change" placeholder="<?php p($l->t( 'Test Nextcloud Username' )); ?>">
+				<small><?php p($l->t( 'You have to use Nextclouds internal username, not the one used for login' )); ?></small><br>
 				<button target="all"><?php p($l->t( 'Test' )); ?></button>
 			</div>
 			
@@ -140,7 +141,8 @@ style( 'ldapcontacts', [ 'settings', 'statistics' ] );
 			</table>
 			
 			<div>
-				<input type="text" id="ldapcontacts-test-settings-uid" class="ignore-change" placeholder="<?php p($l->t( 'Test Username' )); ?>">
+				<input type="text" id="ldapcontacts-test-settings-uid" class="ignore-change" placeholder="<?php p($l->t( 'Test Nextcloud Username' )); ?>">
+				<small><?php p($l->t( 'You have to use Nextclouds internal username, not the one used for login' )); ?></small><br>
 				<button target="all"><?php p($l->t( 'Test' )); ?></button>
 			</div>
 		</script>
