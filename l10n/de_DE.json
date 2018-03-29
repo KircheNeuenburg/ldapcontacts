@@ -69,6 +69,15 @@
 	"Filter for getting all groups" : "Filter um nach einer bestimmten Gruppe zu suchen",
 	"Filter for getting all groups a specific user is a member of" : "Filter um nach allen Gruppen zu suchen, von denen ein bestimmter Benutzer ein Mitglied ist",
 	"Example of an LDAP user" : "Beispiel eines LDAP Benutzers",
-	"Example of an LDAP group" : "Beispiel einer LDAP Gruppe"
+	"Example of an LDAP group" : "Beispiel einer LDAP Gruppe",
+	"Given user" : "Gegebener Benutzer",
+	"Groups from given user" : "Gruppen des gegebenen Benutzers",
+	"Test failed" : "Test fehlgeschlagen",
+	"Username not given or test failed" : "Benutzername nicht gegebenen oder Test fehlgeschlagen",
+	"Test Nextcloud Username" : "Teste Nextcloud Benutzername",
+	"You have to use Nextclouds internal username, not the one used for login" : "Nextclouds interner Benutzername muss verwendet werden, nicht der fürs Login verwendet wird",
+	"Test" : "Testen",
+	"Test Settings" : "Einstellungen Testen",
+	"User found" : "Benutzer gefunden"
 },"pluralForm" :"nplurals=2; plural=(n != 1);"
 }

@@ -835,4 +835,32 @@ class ContactController extends Controller {
 			],
 		] );
 	}
+	
+	/**
+	 * test this apps LDAP settings
+	 * 
+	 * @param string $type
+	 * @param string $var
+	 */
+	public function testSettings( string $type, string $var=NULL ) {
+		// choose a test type
+		switch( $type ) {
+			case 'users':
+				$data = $this->getUsers( false, true );
+				break;
+			case 'user':
+				// check if a user id is given
+				if( !$var ) break;
+				// get the user
+				$data = $this->getUsers( $var, true );
+				break;
+			case 'groups':
+				$data = $this->getGroups( false, true );
+				break;
+		}
+		// check if data was found
+		if( $data ) return new DataResponse( [ 'status' => 'success', 'data' => $data ] );
+		// unvalid type or test failed
+		return new DataResponse( [ 'status' => 'error' ] );
+	}
 }

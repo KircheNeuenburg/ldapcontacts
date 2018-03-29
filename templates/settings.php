@@ -37,6 +37,7 @@ style( 'ldapcontacts', [ 'settings', 'statistics' ] );
 			
 			<span class="msg ldapcontacts-settings-msg"></span><br>
 			
+			
 			<br><h3><?php p($l->t( 'LDAP search filter preview' )); ?></h3><br>
 			
 			<table class="inline">
@@ -80,6 +81,16 @@ style( 'ldapcontacts', [ 'settings', 'statistics' ] );
 				</tbody>
 			</table>
 			
+			
+			<br><h3><?php p($l->t( 'Test Settings' )); ?></h3><br>
+			
+			<div id="ldapcontacts-test-settings">
+				<input type="text" id="ldapcontacts-test-settings-uid" class="ignore-change" placeholder="<?php p($l->t( 'Test Nextcloud Username' )); ?>">
+				<small><?php p($l->t( 'You have to use Nextclouds internal username, not the one used for login' )); ?></small><br>
+				<button target="all"><?php p($l->t( 'Test' )); ?></button>
+			</div>
+			
+			
 			<br><h3><?php p($l->t( 'LDAP User Attributes' )); ?></h3><br>
 			<small><?php p($l->t( 'Define LDAP attributes the users can see and edit' )); ?></small>
 			
@@ -106,6 +117,35 @@ style( 'ldapcontacts', [ 'settings', 'statistics' ] );
             
 			<button class="add-attribute"><span class="icon icon-add"></span><?php p($l->t( 'Add Attribute' )); ?></button>
         </script>
+		
+		<script id="ldapcontacts-test-settings-tpl" type="text/x-handlebars-template">
+			<table class="inline">
+				<tbody>
+					<tr>
+						<td><?php p($l->t( 'Users' )); ?></td>
+						<td>{{#if tests.users}}{{ tests.users }}{{else}}<?php p($l->t( 'Test failed' )); ?>{{/if}}</td>
+					</tr>
+					<tr>
+						<td><?php p($l->t( 'Groups' )); ?></td>
+						<td>{{#if tests.groups}}{{ tests.groups }}{{else}}<?php p($l->t( 'Test failed' )); ?>{{/if}}</td>
+					</tr>
+					<tr>
+						<td><?php p($l->t( 'Given user' )); ?></td>
+						<td>{{#if tests.user_specific}}<?php p($l->t( 'User found' )); ?>{{else}}<?php p($l->t( 'Username not given or test failed' )); ?>{{/if}}</td>
+					</tr>
+					<tr>
+						<td><?php p($l->t( 'Groups from given user' )); ?></td>
+						<td>{{#if tests.user_groups}}{{ tests.user_groups }}{{else}}<?php p($l->t( 'Username not given or test failed' )); ?>{{/if}}</td>
+					</tr>
+				</tbody>
+			</table>
+			
+			<div>
+				<input type="text" id="ldapcontacts-test-settings-uid" class="ignore-change" placeholder="<?php p($l->t( 'Test Nextcloud Username' )); ?>">
+				<small><?php p($l->t( 'You have to use Nextclouds internal username, not the one used for login' )); ?></small><br>
+				<button target="all"><?php p($l->t( 'Test' )); ?></button>
+			</div>
+		</script>
 		
 		<script id="ldapcontacts-general-settings-new-attribute-tpl" type="text/x-handlebars-template">
 			<tr id="user_ldap_attributes_{{ index }}">
