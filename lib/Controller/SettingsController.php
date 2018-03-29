@@ -56,6 +56,7 @@ class SettingsController extends Controller {
             // available data
             'user_ldap_attributes' => [ 'mail' => $this->l->t( 'Mail' ), 'givenname' => $this->l->t( 'First Name' ), 'sn' => $this->l->t( 'Last Name' ), 'street' => $this->l->t( 'Address' ), 'postalcode' => $this->l->t( 'zip Code' ), 'l' => $this->l->t( 'City' ), 'homephone' => $this->l->t( 'Phone' ), 'mobile' => $this->l->t( 'Mobile' ) ],
 			'entry_id_attribute' => 'entryuuid',
+			'ldap_opt_referrals' => 0,
         ];
         // set default user values
         $this->user_default = [

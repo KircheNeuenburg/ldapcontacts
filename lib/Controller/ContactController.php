@@ -87,6 +87,7 @@ class ContactController extends Controller {
 		
 		// TODO(hornigal): catch ldap errors
 		ldap_set_option( $this->connection, LDAP_OPT_PROTOCOL_VERSION, $this->ldap_version);
+		ldap_set_option( $this->connection, LDAP_OPT_REFERRALS, $this->settings->getSetting( 'ldap_opt_referrals', false ) );
 		ldap_bind( $this->connection, $this->admin_dn, $this->admin_pwd );
 		
 		// load translation files
