@@ -14,10 +14,34 @@
 	border-radius: 10px;
 }
 
+#ldapcontacts table tr th {
+	font-weight: bold;
+}
+
+#ldapcontacts table tr th, #ldapcontacts table tr td {
+	padding-right: 10px;
+}
+
+#ldapcontacts table.inline {
+	float: left;
+	margin: 10px 50px 10px 10px;
+}
+
+#ldapcontacts table.inline + *:not(.inline) {
+	clear: left;
+}
+
 #ldapcontacts input[type="text"], #ldapcontacts input[type="url"], #ldapcontacts input[type="email"], #ldapcontacts textarea {
 	width: 100%;
 }
 
+#ldapcontacts .code {
+	background-color: #e1e0e0;
+	border: 1px solid grey;
+	border-radius: 3px;
+	margin-bottom: 5px;
+	padding: 3px 8px;
+}
 
 .edit-user, .edit-group {
 	display: inline-block;

@@ -244,9 +244,9 @@ class ContactController extends Controller {
 			// if no user was found, abort
 			if( !$dn ) return false;
 			$entry_id = $this->getEntryLdapId( $dn );
-			$user_filter = '(&' . $this->user_filter . '(' . $entry_id_attribute . '=' . ldap_escape( $entry_id ) . '))';
+			$user_filter = $this->getEntryFilter( 'user', $entry_id );
 		}
-		else $user_filter = $this->user_filter;
+		else $user_filter = $this->getEntryFilter( 'user' );
 		
 		// check if users are identifyed by dn
 		if( $uid && $entry_id_attribute === 'dn' ) $request = ldap_search( $this->connection, $entry_id, '(objectclass=*)' );
@@ -349,9 +349,9 @@ class ContactController extends Controller {
 		$attributes = [ '*', $entry_id_attribute, $this->group_display_name ];
 		
 		// if the groups of a given user should be found, use a specific filter
-		if( $user_group_id ) $filter = '(&' . $this->group_filter . '(' . $user_group_id_group_attribute . '=' . $user_group_id . '))';
+		if( $user_group_id ) $filter = $this->getEntryFilter( 'group', $user_group_id );
 		// use the general filter
-		else $filter = $this->group_filter;
+		else $filter = $this->getEntryFilter( 'group' );
 		
 		// fetch all groups from the ldap server
 		$request = ldap_list( $this->connection, $this->group_dn, $filter, $attributes );
@@ -784,4 +784,55 @@ class ContactController extends Controller {
         $amount = $this->userAmount();
         return $amount > 0 ? round( $this->usersEmtpyEntries() / $amount * 100, 2 ) : 0;
     }
+	
+	/**
+	 * get the LDAP filter for the given entry type
+	 * 
+	 * @param string $entry_type
+	 * @param string $entry_id
+	 */
+	public function getEntryFilter( string $entry_type, string $entry_id=NULL ) {
+		switch( $entry_type ) {
+			case 'user':
+				// specific user filter
+				if( $entry_id ) {
+					$entry_id_attribute = $this->settings->getSetting( 'entry_id_attribute', false );
+					$filter = '(&' . $this->user_filter . '(' . $entry_id_attribute . '=' . ldap_escape( $entry_id ) . '))';
+				}
+				// general user filter
+				else {
+					$filter = $this->user_filter;
+				}
+				break;
+			case 'group':
+				// specific group filter
+				if( $entry_id ) {
+					$user_group_id_group_attribute = $this->settings->getSetting( 'user_group_id_group_attribute', false );
+					$entry_id_attribute = $this->settings->getSetting( 'entry_id_attribute', false );
+					$filter = '(&' . $this->group_filter . '(' . $user_group_id_group_attribute . '=' . ldap_escape( $entry_id ) . '))';
+				}
+				// general group filter
+				else {
+					$filter = $this->group_filter;
+				}
+				break;
+		}
+		// return generated filter
+		return $filter;
+	}
+	
+	/**
+	 * get a preview of the LDAP search filters used in this app
+	 */
+	public function searchFilterPreviews() {
+		return new DataResponse( [
+			'status' => 'success',
+			'data' => [
+				'user' => $this->getEntryFilter( 'user' ),
+				'user_specific' => $this->getEntryFilter( 'user', '#USER#' ),
+				'group' => $this->getEntryFilter( 'group' ),
+				'group_specific' => $this->getEntryFilter( 'group', '#AA00BB#' ),
+			],
+		] );
+	}
 }

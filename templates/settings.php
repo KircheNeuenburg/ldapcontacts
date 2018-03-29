@@ -35,6 +35,51 @@ style( 'ldapcontacts', [ 'settings', 'statistics' ] );
                 </tbody>
             </table>
 			
+			<span class="msg ldapcontacts-settings-msg"></span><br>
+			
+			<br><h3><?php p($l->t( 'LDAP search filter preview' )); ?></h3><br>
+			
+			<table class="inline">
+				<thead>
+					<tr><th colspan="2"><?php p($l->t( 'Example of an LDAP user' )); ?></th></tr>
+				</thead>
+				<tbody>
+					<tr><th>objectclass</td><td>inetOrgPerson</th></tr>
+					<tr><th>{{ settings.entry_id_attribute }}</th><td>AA00BB</td></tr>
+					<tr><th>{{ settings.user_group_id_attribute }}</th><td>USER</td></tr>
+				</tbody>
+			</table>
+			<table class="inline">
+				<thead>
+					<tr><th colspan="2"><?php p($l->t( 'Example of an LDAP group' )); ?></th></tr>
+				</thead>
+				<tbody>
+					<tr><th>objectclass</th><td>posixGroup</td></tr>
+					<tr><th>{{ settings.entry_id_attribute }}</th><td>BB00CC</td>
+				</tbody>
+			</table>
+			
+			<table>
+                <tbody>
+                    <tr>
+						<td><label><?php p($l->t( 'Filter for getting all users' ));?></label></td>
+						<td><div class="code">{{ search_filter_preview.user }}</div></td>
+					</tr>
+					<tr>
+						<td><label><?php p($l->t( 'Filter for getting specific user' ));?></label></td>
+						<td><div class="code">{{ search_filter_preview.user_specific }}</div></td>
+					</tr>
+					<tr>
+						<td><label><?php p($l->t( 'Filter for getting all groups' ));?></label></td>
+						<td><div class="code">{{ search_filter_preview.group }}</div></td>
+					</tr>
+					<tr>
+						<td><label><?php p($l->t( 'Filter for getting all groups a specific user is a member of' ));?></label></td>
+						<td><div class="code">{{ search_filter_preview.group_specific }}</div></td>
+					</tr>
+				</tbody>
+			</table>
+			
 			<br><h3><?php p($l->t( 'LDAP User Attributes' )); ?></h3><br>
 			<small><?php p($l->t( 'Define LDAP attributes the users can see and edit' )); ?></small>
 			
@@ -60,7 +105,6 @@ style( 'ldapcontacts', [ 'settings', 'statistics' ] );
 			</form>
             
 			<button class="add-attribute"><span class="icon icon-add"></span><?php p($l->t( 'Add Attribute' )); ?></button>
-            <button type="submit"><?php p($l->t( 'Save' )); ?></button>
         </script>
 		
 		<script id="ldapcontacts-general-settings-new-attribute-tpl" type="text/x-handlebars-template">
@@ -72,7 +116,7 @@ style( 'ldapcontacts', [ 'settings', 'statistics' ] );
 		</script>
 		
         <div id="ldapcontacts-general-settings"><span class="icon-loading"></span></div>
-        <span id="ldapcontacts-settings-msg" class="msg"></span>
+        <span class="msg ldapcontacts-settings-msg"></span>
 		<br>
 		
 		<!-- show and hide users section -->

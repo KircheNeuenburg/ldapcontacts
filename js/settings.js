@@ -13,6 +13,7 @@ $(document).ready(function(){
 		this._search_id = 0;
 		this._group_search_id = 0;
         this._settings = [];
+        this._ldap_search_previews = [];
 	};
 	
 	Contacts.prototype = {
@@ -52,7 +53,9 @@ $(document).ready(function(){
 			$.get( this._baseUrl + '/settings', function( data ) {
                 if( data.status == 'success' ) {
                     self._settings = data.data;
-				    deferred.resolve();
+					self.loadLdapSearchPreviews().done( function() {
+						deferred.resolve();
+					});
                 }
                 else {
                     // contacts couldn't be loaded
@@ -60,6 +63,32 @@ $(document).ready(function(){
                 }
 			}).fail( function() {
 				// contacts couldn't be loaded
+				deferred.reject();
+			});
+			return deferred.promise();
+		},
+        // load LDAP search previews
+        loadLdapSearchPreviews: function() {
+			var deferred = $.Deferred();
+			var self = this;
+			// load the previews
+			$.get( this._baseUrl + '/searchfilter/previews', function( data ) {
+                if( data.status == 'success' ) {
+					self._ldap_search_previews = [];
+					// replace escaped data
+					$.each( data.data, function( i, v ) {
+						console.log( i + ' - ' + v );
+						self._ldap_search_previews[ i ] = v.replace( '\\23\\55\\53\\45\\52\\23', 'AA00BB' ).replace( '\\23\\41\\41\\30\\30\\42\\42\\23', 'USER' );
+					});
+					
+					deferred.resolve();
+                }
+                else {
+                    // previews couldn't be loaded
+				    deferred.reject();
+                }
+			}).fail( function() {
+				// previews couldn't be loaded
 				deferred.reject();
 			});
 			return deferred.promise();
@@ -138,7 +167,7 @@ $(document).ready(function(){
             var self = this;
             var source = $( '#ldapcontacts-general-settings-tpl' ).html();
 			var template = Handlebars.compile( source );
-			var html = template( { settings: self._settings } );
+			var html = template( { settings: self._settings, search_filter_preview: self._ldap_search_previews } );
 			$( '#ldapcontacts-general-settings' ).html( html );
 			
 			// remove attribute button
@@ -170,12 +199,12 @@ $(document).ready(function(){
 							element.removeClass( 'icon-loading' ).addClass( 'icon-delete' );
 						}
 						// show a message to the user
-						OC.msg.finishedSaving( '#ldapcontacts-settings-msg', data );
+						OC.msg.finishedSaving( '#ldapcontacts .ldapcontacts-settings-msg', data );
 					}).fail( function() {
 						// if the saving failed, reactivate the remove button
 						element.disabled = false;
 						element.removeClass( 'icon-loading' ).addClass( 'icon-delete' );
-						OC.msg.finishedError( '#ldapcontacts-settings-msg', t( 'ldapcontacts', 'Removing the attribute failed' ) );
+						OC.msg.finishedError( '#ldapcontacts .ldapcontacts-settings-msg', t( 'ldapcontacts', 'Removing the attribute failed' ) );
 					});
 				}
 				// if this is a new attribute, we only have to remove the html
@@ -206,12 +235,12 @@ $(document).ready(function(){
 			});
 			
             // save settings button
-            $( "#ldapcontacts-general-settings button[type='submit']" ).on( 'click', function( e ) {
+            $( "#ldapcontacts-general-settings input" ).on( 'change', function( e ) {
 				e.preventDefault();
 				// get the settings from the form
 				var settings = $( '#ldapcontacts-general-settings-form' ).serialize();
                 // send the new settings
-                OC.msg.startSaving( '#ldapcontacts-settings-msg' );
+                OC.msg.startSaving( '#ldapcontacts .ldapcontacts-settings-msg' );
                 $.ajax({
 					url: self._baseUrl + '/settings/update',
 					method: 'POST',
@@ -222,7 +251,7 @@ $(document).ready(function(){
                     self.loadSettings().done( function() {
                         self.renderSettings();
                     });
-                    OC.msg.finishedSaving( '#ldapcontacts-settings-msg', data );
+                    OC.msg.finishedSaving( '#ldapcontacts .ldapcontacts-settings-msg', data );
                 }).fail( function() {
                     // if the saving failed, reactivate the save button
                     self.renderSettings();

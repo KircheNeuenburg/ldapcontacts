@@ -64,6 +64,13 @@ OC.L10N.register(
 	"Users with only empty entries" : "Benutzer mit nur leeren Einträgen",
 	"Entries filled" : "Ausgefüllte Einträge",
 	"Users with filled entries" : "Benutzer mit ausgefüllten Einträgen",
-	"Unique LDAP Entry Identifier" : "Einzigartige LDAP Eintrag Identifizierung"
+	"Unique LDAP Entry Identifier" : "Einzigartige LDAP Eintrag Identifizierung",
+	"LDAP search filter preview" : "LDAP Suchfilter Vorschau",
+	"Filter for getting all users" : "Filter um nach alle Benutzer zu suchen",
+	"Filter for getting specific user" : "Filter um nach einen bestimmten Benutzer zu suchen",
+	"Filter for getting all groups" : "Filter um nach einer bestimmten Gruppe zu suchen",
+	"Filter for getting all groups a specific user is a member of" : "Filter um nach allen Gruppen zu suchen, von denen ein bestimmter Benutzer ein Mitglied ist",
+	"Example of an LDAP user" : "Beispiel eines LDAP Benutzers",
+	"Example of an LDAP group" : "Beispiel einer LDAP Gruppe"
 },
 "nplurals=2; plural=(n != 1);");
