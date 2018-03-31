@@ -17,11 +17,20 @@ use OCA\LdapContacts\Controller\SettingsController;
 use OCA\LdapContacts\Settings\Admin;
 
 class Application extends App {
+	/** @var string */
+	protected $name;
+	/** @var string */
+	protected $id = 'ldapcontacts';
+	
 	/**
 	 * @param array $urlParams
 	 */
     public function __construct( $urlParams = array() ) {
-        parent::__construct( 'ldapcontacts', $urlParams );
+        parent::__construct( $this->id, $urlParams );
+		
+		// get the apps name
+		$this->name = $this->getContainer()->query( 'OCP\IL10N' )->t( 'Contacts' );
+		
 		// register the apps services
 		$this->registerServices();
 	}
@@ -45,28 +54,41 @@ class Application extends App {
 		
 		$container->query( 'OCP\INavigationManager' )->add( function() use ( $container ) {
 			$urlGenerator = $container->query( 'OCP\IURLGenerator' );
-			$l10n = $container->query( 'OCP\IL10N' );
 			return [
 				// the string under which your app will be referenced in owncloud
-				'id' => 'ldapcontacts',
+				'id' => $this->id,
 
 				// sorting weight for the navigation. The higher the number, the higher
 				// will it be listed in the navigation
 				'order' => 100,
 
 				// the route that will be shown on startup
-				'href' => $urlGenerator->linkToRoute( 'ldapcontacts.contact.index' ),
+				'href' => $urlGenerator->linkToRoute( $this->id . '.contact.index' ),
 
 				// the icon that will be shown in the navigation
 				// this file needs to exist in img/
-				'icon' => $urlGenerator->imagePath( 'ldapcontacts', 'app.svg' ),
+				'icon' => $urlGenerator->imagePath( $this->id, 'app.svg' ),
 
 				// the title of your application. This will be used in the
 				// navigation or on the settings page of your app
-				'name' => $l10n->t( 'Contacts' ),
+				'name' => $this->name,
 			];
 		});
 		
 		\OCP\App::registerPersonal( 'ldapcontacts', 'personal');
+	}
+	
+	/**
+	 * register the apps notifier
+	 */
+	public function registerNotifier() {
+		$manager = \OC::$server->getNotificationManager();
+		$manager->registerNotifier( function() {
+			return new \OCA\LdapContacts\Notification\Notifier(
+				\OC::$server->getL10NFactory()
+			);
+		}, function() {
+			return [ 'id' => $this->id, 'name' => $this->name ];
+		} );
 	}
 }

@@ -65,11 +65,13 @@ class ContactController extends Controller {
 	 * @param Helper $helper
 	 * @param UserMapping $userMapping
 	 * @param GroupMapping $groupMapping
+	 * @param NotificationManager notificationManager
 	 */
 	public function __construct( $AppName, IRequest $request, IConfig $config, SettingsController $settings, $UserId, Manager $userManager, Helper $helper, UserMapping $userMapping, GroupMapping $groupMapping, IDBConnection $db ) {
 		// check we have a logged in user
-		\OCP\User::checkLoggedIn();
+		\OC_Util::checkLoggedIn();
 		parent::__construct( $AppName, $request );
+		
 		// get database connection
 		$this->db = $db;
         // get the settings controller
@@ -117,10 +119,6 @@ class ContactController extends Controller {
 			$connection = new \OCA\User_LDAP\Connection( $ldapWrapper, 's01' );
 			$config = $connection->getConfiguration();
 		}
-		
-		
-		
-		
 		
 		// check which constructor to use
 		try {
@@ -863,5 +861,29 @@ class ContactController extends Controller {
 		if( $data ) return new DataResponse( [ 'status' => 'success', 'data' => $data ] );
 		// unvalid type or test failed
 		return new DataResponse( [ 'status' => 'error' ] );
+	}
+	
+	/**
+	 * notify the user if it's contact information hasn't filled out yet
+	 * 
+	 * @NoAdminRequired
+	 * @NoCSRFRequired
+	 */
+	public function notifyContactInfoNotFilledOut() {
+		// create notification from manager
+		$manager = \OC::$server->getNotificationManager();
+		$notification = $manager->createNotification();
+		
+		// setup notification
+		$notification->setApp( $this->AppName )
+			->setUser( $this->uid )
+			->setDateTime( new \DateTime() )
+			->setObject( 'contact', '1' )
+			->setSubject( 'contact_info_not_filled' )
+			->setMessage( 'fill_out_now' )
+		;
+		
+		// register notification
+		$manager->notify( $notification );
 	}
 }

@@ -35,6 +35,11 @@ return [
 	   [ 'name' => 'contact#testSettings', 'url' => '/test/{type}/{var}', 'verb' => 'GET' ],
 	   [ 'name' => 'contact#getStatistic', 'url' => '/statistic/{type}', 'verb' => 'GET' ],
 	   [ 'name' => 'contact#getStatistics', 'url' => '/statistics', 'verb' => 'GET' ],
+		
+		
+	   [ 'name' => 'contact#notifyContactInfoNotFilledOut', 'url' => '/notify/contact-not-filled', 'verb' => 'GET' ],
+		
+		
 	   [ 'name' => 'settings#setUserValue', 'url' => '/settings/personal', 'verb' => 'POST' ],
 	   [ 'name' => 'settings#getUserValue', 'url' => '/settings/personal/{key}', 'verb' => 'GET' ],
 	   [ 'name' => 'settings#updateSettings', 'url' => '/settings/update', 'verb' => 'POST' ],

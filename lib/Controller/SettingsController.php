@@ -38,7 +38,7 @@ class SettingsController extends Controller {
 	 */
 	public function __construct($AppName, IRequest $request, IL10N $l10n, IConfig $config, $UserId ) {
         // check we have a logged in user
-		\OCP\User::checkLoggedIn();
+		\OC_Util::checkLoggedIn();
 		parent::__construct( $AppName, $request );
 		// set class variables
 		$this->AppName = $AppName;
