@@ -46,6 +46,9 @@ style('ldapcontacts', 'tutorial');
 		<script id="content-tpl" type="text/x-handlebars-template">
 			{{#if contact}}
 				<h2>{{#if contact.ldapcontacts_name}}{{ contact.ldapcontacts_name }}{{/if}}</h2>
+				{{#if contact.thumbnailPhoto}}
+					<p style="float:none;"><img src="data:image/jpeg;base64,{{ contact.thumbnailPhoto }}"/></p>
+				{{/if}}
 				<table>
 					<tbody>
                         <?php

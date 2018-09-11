@@ -308,7 +308,10 @@ class ContactController extends Controller {
 			$groups = $this->getGroups( $group_uid_attribute );
 			if( $groups ) $tmp['groups'] = $groups;
 			else $tmp['groups'] = array();
-			
+
+			// Get picture for person
+			$tmp['thumbnailPhoto'] = base64_encode($result[ 'thumbnailphoto' ][0]
+
 			// delete all empty entries
 			foreach( $tmp as $key => $value ) {
 				if( !is_array( $value ) && empty( trim( $value ) ) ) unset( $tmp[ $key ] );
