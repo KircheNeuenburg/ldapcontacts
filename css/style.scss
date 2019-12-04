@@ -1,0 +1,123 @@
+/* messages */
+.msg-container {
+	margin-top: 30px;
+
+	.msg {
+		padding: 5px 10px;
+		border-radius: var(--border-radius);
+		font-weight: bold;
+		color: #fff;
+		margin-top: 8px;
+	}
+
+	.success {
+		background-color: var(--color-success);
+	}
+
+	.warning {
+		background-color: var(--color-warning);
+	}
+
+	.error {
+		background-color: var(--color-error);
+	}
+}
+/* end of messages */
+
+/* content */
+#content {
+	width: 100%;
+}
+
+#app-content {
+	padding: 0 30px 30px;
+}
+
+.no-list-style {
+	list-style: none;
+}
+
+table tr td:first-child {
+	padding-right: 30px;
+	font-weight: bold;
+}
+/* end of content */
+
+/* navigation */
+#navigation-header {
+	border-bottom: 1px solid var(--color-border);
+
+	.loading {
+		min-height: 110px;
+	}
+
+	.search-container {
+		position: relative;
+
+		input {
+			width: calc(100% - 24px);
+			margin: 14px 12px;
+			padding: 5px 25px;
+			background: transparent url('../img/search.svg?v=1') no-repeat 5px center;
+		}
+
+		.abort {
+			opacity: 0.5;
+			transition: opacity 0.5s;
+			background: transparent var(--icon-close-000) no-repeat center;
+			background-size: auto;
+			background-size: 100%;
+			width: 20px;
+			height: 20px;
+			position: absolute;
+			right: 16px;
+			top: 20px;
+			cursor: pointer;
+		}
+
+		.abort:focus, .abort:hover, .abort:active {
+			opacity: 0.8;
+		}
+	}
+
+	.select-group {
+		width: calc(100% - 24px);
+		margin: 0px 12px 14px;
+	}
+}
+
+#app-navigation > .icon-loading {
+	min-height: 50px;
+}
+/* end of navigation */
+
+/* content */
+#contactDetails {
+	input:disabled {
+		background-color: var(--color-main-background);
+		color: var(--color-main-text);
+		opacity: 1;
+	}
+}
+/* end of content */
+
+/* editor */
+#editContactDetails {
+	input {
+		min-width: 300px;
+	}
+
+	.save-button-wrapper {
+		button {
+			vertical-align: middle;
+		}
+
+		.icon-loading {
+			width: 35px;
+			height: 35px;
+			display: inline-block;
+			vertical-align: middle;
+		}
+	}
+}
+/* end of editor */

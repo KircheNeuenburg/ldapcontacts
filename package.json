@@ -1,0 +1,82 @@
+{
+	"name": "ldapcontacts",
+	"description": "Display your LDAP contacts",
+	"version": "2.0.0",
+	"author": "Alexander Hornig <alexander@h-software.de>",
+	"contributors": [
+		"Alexander Hornig <alexander@h-software.de>"
+	],
+	"keywords": [
+		"nextcloud",
+		"app",
+		"dev",
+		"vuejs"
+	],
+	"bugs": {
+		"url": "https://github.com/KircheNeuenburg/ldapcontacts/issues"
+	},
+	"repository": {
+		"url": "https://github.com/KircheNeuenburg/ldapcontacts",
+		"type": "git"
+	},
+	"homepage": "https://github.com/KircheNeuenburg/ldapcontacts",
+	"license": "agpl",
+	"private": true,
+	"scripts": {
+		"dev": "webpack --config webpack.dev.js",
+		"watch": "webpack --progress --watch --config webpack.dev.js",
+		"build": "webpack --progress --hide-modules --config webpack.prod.js",
+		"lint": "eslint --ext .js,.vue src",
+		"lint:fix": "eslint --ext .js,.vue src --fix",
+		"stylelint": "stylelint src",
+		"stylelint:fix": "stylelint src --fix"
+	},
+	"dependencies": {
+		"axios": "^0.19.0",
+		"jquery": "^3.4.1",
+		"@nextcloud/l10n": "^0.2.1",
+		"@nextcloud/vue": "^1.0.0",
+		"vue": "^2.6.10"
+	},
+	"browserslist": [
+		"extends browserslist-config-nextcloud"
+	],
+	"engines": {
+		"node": ">=10.0.0"
+	},
+	"devDependencies": {
+		"@babel/core": "^7.6.4",
+		"@babel/plugin-syntax-dynamic-import": "^7.2.0",
+		"@babel/preset-env": "^7.6.3",
+		"@vue/test-utils": "^1.0.0-beta.29",
+		"babel-eslint": "^10.0.3",
+		"babel-loader": "^8.0.6",
+		"css-loader": "^3.2.0",
+		"eslint": "^5.0.0",
+		"eslint-config-nextcloud": "0.0.6",
+		"eslint-config-standard": "^12.0.0",
+		"eslint-import-resolver-webpack": "^0.11.1",
+		"eslint-loader": "^3.0.2",
+		"eslint-plugin-import": "^2.18.2",
+		"eslint-plugin-nextcloud": "^0.3.0",
+		"eslint-plugin-node": "^10.0.0",
+		"eslint-plugin-promise": "^4.2.1",
+		"eslint-plugin-standard": "^4.0.1",
+		"eslint-plugin-vue": "^5.2.3",
+		"node-sass": "^4.12.0",
+		"sass-loader": "^8.0.0",
+		"stylelint": "^11.1.1",
+		"stylelint-config-recommended-scss": "^4.0.0",
+		"stylelint-scss": "^3.11.1",
+		"stylelint-webpack-plugin": "^1.0.2",
+		"vue-loader": "^15.7.1",
+		"vue-template-compiler": "^2.6.10",
+		"webpack": "^4.41.2",
+		"webpack-cli": "^3.3.9",
+		"webpack-merge": "^4.2.2",
+		"webpack-node-externals": "^1.7.2",
+		"sass": "^1.23.0",
+		"fibers": "^4.0.1",
+		"vue-style-loader": "^4.1.2"
+	}
+}

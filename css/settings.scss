@@ -1,0 +1,173 @@
+#ldapcontacts-settings  {
+	/* general */
+	.no-list-style {
+		list-style: none;
+	}
+
+	.container{
+		margin-top: 10px;
+		padding: 5px;
+		border: 1px solid grey;
+		border-radius: 10px;
+	}
+	/* end of general */
+
+	/* buttons */
+	.standalone button.action-button {
+		background-color: #c8c8c8;
+		border-radius: 7px;
+	}
+
+	.save-button-wrapper {
+		button {
+			vertical-align: middle;
+		}
+
+		.icon-loading {
+			width: 35px;
+			height: 35px;
+			display: inline-block;
+			vertical-align: middle;
+		}
+	}
+	/* end of buttons */
+
+	/* messages */
+	.msg-container {
+		margin-top: 30px;
+
+		.msg {
+			padding: 5px 10px;
+			border-radius: var(--border-radius);
+			font-weight: bold;
+			color: #fff;
+			margin-top: 8px;
+		}
+
+		.success {
+			background-color: var(--color-success);
+		}
+
+		.warning {
+			background-color: var(--color-warning);
+		}
+
+		.error {
+			background-color: var(--color-error);
+		}
+	}
+	/* end of messages */
+
+	/* search */
+	.search-container {
+		position: relative;
+
+		.search {
+			position: relative;
+		}
+
+		.search-suggestions {
+			display: inline-block;
+			position: absolute;
+			top: 32px;
+			left: 2px;
+			z-index: 2;
+		}
+
+		.search-suggestions > .suggestion {
+			z-index: 2;
+			cursor: pointer;
+			background-color: rgba(240, 240, 240, 1);
+			padding: 3px 10px;
+		}
+
+		.search-suggestions > .suggestion:focus, .search-suggestions > .suggestion:hover, .search-suggestions > .suggestion:active {
+			background-color: rgba(201, 201, 201, 1);
+		}
+
+		.search-suggestions > .suggestion:last-child {
+			border-radius: 0 0 4px 4px;
+		}
+
+		input[type='search'] {
+			background: transparent url('../img/search.svg?v=1') no-repeat 5px center;
+			padding: 5px 25px;
+			transition: width 0.5s;
+			min-width: 250px;
+		}
+
+		input[type='search'] + .abort {
+			opacity: 0;
+			transition: opacity 0.5s;
+			background: transparent url('../img/remove.svg?v=1') no-repeat center;
+			background-size: 100%;
+			width: 0;
+			height: 20px;
+			position: absolute;
+			top: 18px;
+			right: 12px;
+		}
+
+		input[type='search'].searching + .abort {
+			opacity: 0.5;
+			width: 20px;
+			cursor: pointer;
+			margin-top: -20px;
+		}
+
+		input[type='search'].searching + .abort:hover, input[type='search'].searching + .abort:focus, input[type='search'].searching + .abort:active {
+			opacity: 0.8;
+		}
+
+		.search-suggestion-container {
+			position: absolute;
+			border-top: 1px solid var(--color-box-shadow);
+
+			.suggestion {
+				transition: background-color 0.3s;
+				background-color: var(--color-background-dark);
+				padding: 2px 3px;
+				border-bottom: 1px solid var(--color-box-shadow);
+				cursor: pointer;
+				min-width: 200px;
+			}
+
+			.suggestion:focus, .suggestion:hover, .suggestion:active {
+				background-color: var(--color-background-darker);
+			}
+		}
+	}
+	/* end of search */
+
+	/* hidden entities */
+	.hidden-entity {
+		display: inline-block;
+		margin: 5px;
+	}
+
+	.hidden-entity > * {
+		background-color: rgba(240, 240, 240, 0.9);
+		display: inline-block;
+		height: 23px;
+		padding: 1px 7px 0;
+	}
+
+	.hidden-entity > .name {
+		display: inline-block;
+		border-right: 1px solid grey;
+		border-radius: 5px 0 0 5px;
+	}
+
+	.hidden-entity > .remove {
+		border-left: 1px solid grey;
+		font-weight: bold;
+		z-index: 10;
+		cursor: pointer;
+		border-radius: 0 5px 5px 0;
+	}
+
+	.hidden-entity > .remove:focus, .hidden-entity > .remove:hover, .hidden-entity > .remove:active {
+		background-color: rgba(201, 201, 201, 1);
+	}
+	/* end of hidden entities */
+}

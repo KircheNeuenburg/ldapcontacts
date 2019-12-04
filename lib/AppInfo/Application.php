@@ -1,48 +1,22 @@
 <?php
-/**
- * Nextcloud - ldapcontacts
- *
- * This file is licensed under the Affero General Public License version 3 or
- * later. See the COPYING file.
- *
- * @author Alexander Hornig <alexander@hornig-software.com>
- * @copyright Hornig Software 2017
- */
-
 namespace OCA\LdapContacts\AppInfo;
 
 use \OCP\AppFramework\App;
-use OCA\LdapContacts\Controller\ContactController;
-use OCA\LdapContacts\Controller\SettingsController;
-use OCA\LdapContacts\Settings\Admin;
 
 class Application extends App {
 	/**
 	 * @param array $urlParams
 	 */
     public function __construct( $urlParams = array() ) {
-        parent::__construct( 'ldapcontacts', $urlParams );
-		// register the apps services
-		$this->registerServices();
+      parent::__construct( 'ldapcontacts', $urlParams );
 	}
-	
-	/**
-	 * register all required services
-	 */
-	private function registerServices() {
-        $container = $this->getContainer();
-		$container->registerAlias( 'ContactController', ContactController::class);
-		$container->registerAlias( 'SettingsController', SettingsController::class);
-		$container->registerAlias( 'Admin', Admin::class);
-		$container->registerAlias( 'AdminStatistics', AdminStatistics::class);
-    }
-	
+
 	/**
 	 * register the navigation button
 	 */
 	public function registerNavigation() {
 		$container = $this->getContainer();
-		
+
 		$container->query( 'OCP\INavigationManager' )->add( function() use ( $container ) {
 			$urlGenerator = $container->query( 'OCP\IURLGenerator' );
 			$l10n = $container->query( 'OCP\IL10N' );
@@ -66,7 +40,5 @@ class Application extends App {
 				'name' => $l10n->t( 'Contacts' ),
 			];
 		});
-		
-		\OCP\App::registerPersonal( 'ldapcontacts', 'personal');
 	}
 }

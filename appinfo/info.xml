@@ -1,8 +1,8 @@
 <?xml version="1.0"?>
 <info xmlns:xsi= "http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://apps.nextcloud.com/schema/apps/info.xsd">
-    <id>ldapcontacts</id>
-    <name lang="en">LDAP Contacts</name>
-    <summary lang="en">Display your LDAP contacts</summary>
+  <id>ldapcontacts</id>
+  <name lang="en">LDAP Contacts</name>
+  <summary lang="en">Display your LDAP contacts</summary>
 	<description><![CDATA[# LdapContacts
 View other LDAP users as contacts in Nextcloud and see the personal data they shared.
 
@@ -14,38 +14,38 @@ View other LDAP users as contacts in Nextcloud and see the personal data they sh
   * define which LDAP attributes are available for your contacts
 
 ### Requirements
-  * active LDAP authentification (check [Nextcloud admin manual](https://docs.nextcloud.com/server/13/admin_manual/configuration_user/user_auth_ldap.html) for details)
-  * php 7.0
+  * active LDAP authentification (check [Nextcloud admin manual](https://docs.nextcloud.com/server/latest/admin_manual/configuration_user/user_auth_ldap.html) for details)
+  * php 7.0]]>
+  </description>
+  <version>2.0.0</version>
+  <licence>AGPL</licence>
+  <author mail="alexander@h-software.de" homepage="https://h-software.de">Alexander Hornig</author>
+  <namespace>LdapContacts</namespace>
+  <category>tools</category>
+  <website>https://github.com/KircheNeuenburg/ldapcontacts</website>
+  <bugs>https://github.com/KircheNeuenburg/ldapcontacts/issues</bugs>
+  <repository type="git">https://github.com/KircheNeuenburg/ldapcontacts.git</repository>
+  <screenshot>https://raw.githubusercontent.com/KircheNeuenburg/ldapcontacts/master/screenshots/main.jpg</screenshot>
 
-### Known Issues
-  * Group membership via the groups "memberOf" attribute not yet supported.]]></description>
-    <version>1.1.4</version>
-    <licence>AGPL</licence>
-    <author mail="alexander@h-software.de" homepage="https://h-software.de">Alexander Hornig</author>
-    <namespace>LdapContacts</namespace>
-    
 	<types>
 		<tool/>
 	</types>
-    
-    <category>tools</category>
-    
-    <website>https://github.com/KircheNeuenburg/ldapcontacts</website>
-    
-    <bugs>https://github.com/KircheNeuenburg/ldapcontacts/issues</bugs>
 
-    <repository type="git">https://github.com/KircheNeuenburg/ldapcontacts.git</repository>
-    
-    <screenshot>https://raw.githubusercontent.com/KircheNeuenburg/ldapcontacts/master/screenshots/main.jpg</screenshot>
-	
-    <dependencies>
-        <user_ldap/>
-        <nextcloud min-version="11" max-version="13"/>
-		<php min-version="7.0"/>
-    </dependencies>
-	
+  <dependencies>
+      <user_ldap/>
+      <nextcloud min-version="17" max-version="17"/>
+	    <php min-version="7.0"/>
+  </dependencies>
+
 	<settings>
 		<admin>OCA\LdapContacts\Settings\Admin</admin>
 		<personal>OCA\LdapContacts\Settings\Personal</personal>
+		<personal-section>OCA\LdapContacts\Settings\PersonalSection</personal-section>
 	</settings>
+
+  <repair-steps>
+    <post-migration>
+      <step>OCA\LdapContacts\Migration\Settings</step>
+    </post-migration>
+  </repair-steps>
 </info>
