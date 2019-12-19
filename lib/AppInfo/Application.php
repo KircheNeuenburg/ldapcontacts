@@ -7,8 +7,8 @@ class Application extends App {
 	/**
 	 * @param array $urlParams
 	 */
-    public function __construct( $urlParams = array() ) {
-      parent::__construct( 'ldapcontacts', $urlParams );
+  public function __construct( $urlParams = array() ) {
+    parent::__construct( 'ldapcontacts', $urlParams );
 	}
 
 	/**

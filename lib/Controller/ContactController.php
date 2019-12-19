@@ -1,7 +1,6 @@
 <?php
 namespace OCA\LdapContacts\Controller;
 
-use OCP\IConfig;
 use OCP\IL10N;
 use OCP\IRequest;
 use OCP\AppFramework\Controller;
@@ -16,8 +15,6 @@ use OC\ServerNotAvailableException;
 class ContactController extends Controller {
 	/** @var string **/
 	protected $appName;
-	/** @var IConfig **/
-	protected $config;
 	/** @var SettingsController **/
 	protected $settings;
 	/** @var string **/
@@ -30,7 +27,6 @@ class ContactController extends Controller {
   /**
 	 * @param string $appName
 	 * @param IRequest $request
-	 * @param IConfig $config
 	 * @param SettingsController $settings
 	 * @param string $UserId
 	 * @param IL10N $l10n
@@ -38,7 +34,6 @@ class ContactController extends Controller {
 	 */
 	public function __construct(string $appName,
 															IRequest $request,
-															IConfig $config,
 															SettingsController $settings,
 															string $UserId,
 															IL10N $l10n,
@@ -48,7 +43,6 @@ class ContactController extends Controller {
 		$this->settings = $settings;
 		$this->uid = $UserId;
 		$this->l = $l10n;
-		$this->config = $config;
 		$this->entityFactory = $entityFactory;
 	}
 
@@ -122,10 +116,11 @@ class ContactController extends Controller {
 	/**
 	 * updates a users own data
 	 *
-	 * @param string $data
+	 * @NoAdminRequired
+	 * @param array $data
 	 * @return DataResponse
 	 */
-	public function update( $data ) {
+	public function update(array $data) {
 		// modify user
 		$user = $this->entityFactory->getUserByNcId($this->uid);
 		$status = $user->getUuid() === $data['uuid'] ? $user->updateData($data['ldapAttributes']) : false;

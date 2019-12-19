@@ -61,7 +61,7 @@
 							:placeholder="text.hideUser"
 							type="search"
 							@keyup="searchVisibleUsers">
-						<span class="abort" @click="abortSearch" />
+						<span class="abort" @click="abortSearch('group')" />
 					</span>
 					<div class="search-suggestion-container">
 						<div v-for="user in hideUserSearchSuggestions"
@@ -89,7 +89,7 @@
 							:placeholder="text.hideGroup"
 							type="search"
 							@keyup="searchVisibleGroups">
-						<span class="abort" @click="abortSearch" />
+						<span class="abort" @click="abortSearch('user')" />
 					</span>
 					<div class="search-suggestion-container">
 						<div v-for="group in hideGroupSearchSuggestions"
@@ -192,7 +192,7 @@ export default {
 			this.$set(this.settings.userLdapAttributes, this.getHighestIndex(this.settings.userLdapAttributes) + 1, newAttribute)
 		},
 		getHighestIndex(obj) {
-			if (this.objectIsEmpty(obj)) return 0
+			if (this.objectIsEmpty(obj)) return -1
 			else return Number(Object.keys(obj).reduce((a, b) => obj[a] > obj[b] ? a : b))
 		},
 		objectIsEmpty(obj) {
@@ -328,6 +328,8 @@ export default {
 						$.each(response.data.data, function(settingKey, settingValue) {
 							self.settings[ settingKey ] = settingValue
 						})
+						// have at least one user attribute visible
+						if (self.objectIsEmpty(self.settings.userLdapAttributes)) self.addAttribute()
 					} else {
 						self.displayMessage(response.data.message, response.data.status)
 					}

@@ -43,6 +43,11 @@ class LdapGroup extends LdapEntity {
    */
   protected function updateIsHiddenAttribute() {
     $hiddenGroupIdList = $this->settings->getSetting('hiddenGroups', false);
+    if ($hiddenGroupIdList === false) {
+      // no users were hidden yet
+      $this->hidden = false;
+      return;
+    }
     $this->hidden = in_array($this->uuid, $hiddenGroupIdList);
   }
 }
