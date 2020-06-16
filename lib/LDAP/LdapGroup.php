@@ -19,7 +19,7 @@ class LdapGroup extends LdapEntity {
    */
   protected function loadLdapAttributeValues() {
     // fetch ladp attributes
-    $groupList = $this->server->search($this->server->connection->ldapGroupFilter, [$this->dn], $this->ldapAttributeKeys);
+    $groupList = $this->server->search($this->server->connection->ldapGroupFilter, $this->dn, $this->ldapAttributeKeys);
     if (empty($groupList)) return false;
     // turn the array values into single strings
     foreach ($groupList[0] as $attributeKey => $valueArray) {
