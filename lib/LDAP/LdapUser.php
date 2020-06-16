@@ -59,7 +59,7 @@ class LdapUser extends LdapEntity {
    */
   protected function loadLdapAttributeValues() {
     // fetch ladp attributes
-    $userList = $this->server->search($this->server->connection->ldapUserFilter, [$this->dn], $this->ldapAttributeKeys);
+    $userList = $this->server->search($this->server->connection->ldapUserFilter, $this->dn, $this->ldapAttributeKeys);
     if (empty($userList)) return false;
     // turn the array values into single strings
     foreach ($userList[0] as $attributeKey => $valueArray) {
