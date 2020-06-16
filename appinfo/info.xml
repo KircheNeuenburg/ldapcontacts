@@ -17,8 +17,8 @@ View other LDAP users as contacts in Nextcloud and see the personal data they sh
   * active LDAP authentification (check [Nextcloud admin manual](https://docs.nextcloud.com/server/latest/admin_manual/configuration_user/user_auth_ldap.html) for details)
   * php 7.0]]>
   </description>
-  <version>2.0.1</version>
-  <licence>AGPL</licence>
+  <version>2.0.3</version>
+  <licence>agpl</licence>
   <author mail="alexander@h-software.de" homepage="https://h-software.de">Alexander Hornig</author>
   <namespace>LdapContacts</namespace>
   <category>tools</category>
@@ -27,25 +27,20 @@ View other LDAP users as contacts in Nextcloud and see the personal data they sh
   <repository type="git">https://github.com/KircheNeuenburg/ldapcontacts.git</repository>
   <screenshot>https://raw.githubusercontent.com/KircheNeuenburg/ldapcontacts/master/screenshots/main.jpg</screenshot>
 
-	<types>
-		<tool/>
-	</types>
-
   <dependencies>
-      <user_ldap/>
-      <nextcloud min-version="17" max-version="17"/>
-	    <php min-version="7.0"/>
+	  <php min-version="7.0"/>
+      <nextcloud min-version="19" max-version="19"/>
   </dependencies>
-
-	<settings>
-		<admin>OCA\LdapContacts\Settings\Admin</admin>
-		<personal>OCA\LdapContacts\Settings\Personal</personal>
-		<personal-section>OCA\LdapContacts\Settings\PersonalSection</personal-section>
-	</settings>
 
   <repair-steps>
     <post-migration>
       <step>OCA\LdapContacts\Migration\Settings</step>
     </post-migration>
   </repair-steps>
+
+	<settings>
+		<admin>OCA\LdapContacts\Settings\Admin</admin>
+		<personal>OCA\LdapContacts\Settings\Personal</personal>
+		<personal-section>OCA\LdapContacts\Settings\PersonalSection</personal-section>
+	</settings>
 </info>

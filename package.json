@@ -1,7 +1,7 @@
 {
 	"name": "ldapcontacts",
 	"description": "Display your LDAP contacts",
-	"version": "2.0.1",
+	"version": "2.0.3",
 	"author": "Alexander Hornig <alexander@h-software.de>",
 	"contributors": [
 		"Alexander Hornig <alexander@h-software.de>"
@@ -32,10 +32,10 @@
 		"stylelint:fix": "stylelint src --fix"
 	},
 	"dependencies": {
-		"axios": "^0.19.0",
-		"jquery": "^3.4.1",
 		"@nextcloud/l10n": "^0.2.1",
 		"@nextcloud/vue": "^1.0.0",
+		"axios": "^0.19.0",
+		"jquery": "^3.5.1",
 		"vue": "^2.6.10"
 	},
 	"browserslist": [
@@ -63,20 +63,20 @@
 		"eslint-plugin-promise": "^4.2.1",
 		"eslint-plugin-standard": "^4.0.1",
 		"eslint-plugin-vue": "^5.2.3",
-		"node-sass": "^4.12.0",
+		"fibers": "^4.0.1",
+		"node-sass": "^4.14.1",
+		"sass": "^1.23.0",
 		"sass-loader": "^8.0.0",
-		"stylelint": "^11.1.1",
+		"stylelint": "^13.5.0",
 		"stylelint-config-recommended-scss": "^4.0.0",
 		"stylelint-scss": "^3.11.1",
 		"stylelint-webpack-plugin": "^1.0.2",
 		"vue-loader": "^15.7.1",
+		"vue-style-loader": "^4.1.2",
 		"vue-template-compiler": "^2.6.10",
 		"webpack": "^4.41.2",
 		"webpack-cli": "^3.3.9",
 		"webpack-merge": "^4.2.2",
-		"webpack-node-externals": "^1.7.2",
-		"sass": "^1.23.0",
-		"fibers": "^4.0.1",
-		"vue-style-loader": "^4.1.2"
+		"webpack-node-externals": "^1.7.2"
 	}
 }
