@@ -239,7 +239,7 @@ class EntityFactory {
 
     // get all users from all servers
     foreach ($this->getAvailableServerList() as $server) {
-      $serverUserList = $server->fetchListOfUsers($server->connection->ldapUserFilter, 'dn');
+      $serverUserList = $server->fetchListOfUsers($server->connection->ldapUserFilter, ['dn']);
 
       // loop through all users
       foreach ($serverUserList as $dn) {
@@ -268,7 +268,7 @@ class EntityFactory {
 
     // get all groups from all servers
     foreach ($this->getAvailableServerList() as $server) {
-      $serverGroupList = $server->fetchListOfGroups($server->connection->ldapGroupFilter, 'dn');
+      $serverGroupList = $server->fetchListOfGroups($server->connection->ldapGroupFilter, ['dn']);
       // loop through all groups
       foreach ($serverGroupList as $dn) {
         try {
