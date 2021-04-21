@@ -23,6 +23,10 @@ npm-init:
 npm-update:
 	npm update
 
+npm-upgrade:
+	npm install -g npm-check-updates
+	ncu -u
+
 # Building
 build-js:
 	npm run dev

@@ -2,4 +2,3 @@ build
 node_modules
 js/ldapcontacts_*.js
 js/ldapcontacts_*.js.map
-package-lock.json

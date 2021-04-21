@@ -3,6 +3,7 @@ const { VueLoaderPlugin } = require('vue-loader')
 const StyleLintPlugin = require('stylelint-webpack-plugin')
 const packageJson = require('./package.json')
 const appName = packageJson.name
+const ESLintPlugin = require('eslint-webpack-plugin')
 
 module.exports = {
 	entry: {
@@ -28,12 +29,6 @@ module.exports = {
 				use: ['vue-style-loader', 'css-loader', 'sass-loader']
 			},
 			{
-				test: /\.(js|vue)$/,
-				use: 'eslint-loader',
-				exclude: [ /node_modules/, /\.min\.js$/ ],
-				enforce: 'pre'
-			},
-			{
 				test: /\.vue$/,
 				loader: 'vue-loader',
 				exclude: /node_modules/
@@ -47,7 +42,11 @@ module.exports = {
 	},
 	plugins: [
 		new VueLoaderPlugin(),
-		new StyleLintPlugin()
+		new StyleLintPlugin(),
+		/*new ESLintPlugin({
+			 extensions: ['js', 'vue'],
+			 exclude: [ 'node_modules', '\.min\.js$' ],
+		})*/
 	],
 	resolve: {
 		extensions: ['*', '.js', '.vue']
