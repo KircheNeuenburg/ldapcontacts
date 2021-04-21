@@ -51,7 +51,8 @@
 				v-bind="{
 					contactDetails: activeContact,
 					editMode: editActiveContact
-				}" />
+				}"
+				@attribute-updated="ldapAttributeUpdated" />
 		</AppContent>
 	</Content>
 </template>
@@ -75,15 +76,15 @@ export default {
 		AppNavigation,
 		AppNavigationItem,
 		AppNavigationSettings,
-		ContactDetails
+		ContactDetails,
 	},
-	data: function() {
+	data() {
 		return {
 			loading: true,
 			groupsLoading: true,
 			loadingOwnContact: true,
 			savingOwnContactDetails: false,
-			baseUrl: OC.generateUrl('/apps/ldapcontacts'),
+			baseUrl: this.generateUrl('/apps/ldapcontacts'),
 			activeContact: {},
 			availabeContactsList: {},
 			visibleContactsList: {},
@@ -95,8 +96,8 @@ export default {
 			text: {
 				editOwnContactDetails: t('ldapcontacts', 'Edit own contact details'),
 				all: t('ldapcontacts', 'All'),
-				searchUsers: t('ldapcontacts', 'Search Users')
-			}
+				searchUsers: t('ldapcontacts', 'Search Users'),
+			},
 		}
 	},
 	computed: {},
@@ -107,7 +108,7 @@ export default {
 	},
 	methods: {
 		fetchContacts() {
-			var self = this
+			const self = this
 
 			Axios.get(self.baseUrl + '/load')
 				.then(function(response) {
@@ -124,7 +125,7 @@ export default {
 				})
 		},
 		fetchOwnContact() {
-			var self = this
+			const self = this
 
 			Axios.get(self.baseUrl + '/own')
 				.then(function(response) {
@@ -141,7 +142,7 @@ export default {
 				})
 		},
 		fetchGroups() {
-			var self = this
+			const self = this
 
 			Axios.get(self.baseUrl + '/groups')
 				.then(function(response) {
@@ -166,7 +167,7 @@ export default {
 			this.updateSearch()
 		},
 		editOwnData() {
-			var self = this
+			const self = this
 			self.activeContact = {}
 
 			if (!self.editActiveContact) {
@@ -181,9 +182,9 @@ export default {
 			self.editActiveContact ^= 1
 		},
 		updateSearch() {
-			var self = this
+			const self = this
 			self.visibleContactsList = {}
-			var preselectedByGroup = {}
+			let preselectedByGroup = {}
 
 			/** filter by group **/
 			if (self.selectedGroupId === '') preselectedByGroup = self.availabeContactsList
@@ -191,7 +192,7 @@ export default {
 				$.each(self.availabeContactsList, function(i, contact) {
 					$.each(contact.groups, function(j, group) {
 						if (self.selectedGroupId === group.uuid) {
-							preselectedByGroup[ contact.uuid ] = contact
+							preselectedByGroup[contact.uuid] = contact
 							return false
 						}
 					})
@@ -200,17 +201,17 @@ export default {
 
 			/** filter by search input **/
 			// split search terms
-			var searchTerms = self.contactSearchInput.split(' ')
+			let searchTerms = self.contactSearchInput.split(' ')
 			// filter out empty ones
-			var temp = []
-			for (let term of searchTerms) term && temp.push(term.toLowerCase())
+			const temp = []
+			for (const term of searchTerms) term && temp.push(term.toLowerCase())
 			searchTerms = temp
 
 			// perform the search
 			if (searchTerms.length < 1) self.visibleContactsList = preselectedByGroup
 			else {
 				$.each(preselectedByGroup, function(i, contact) {
-					var hits = 0
+					let hits = 0
 					$.each(searchTerms, function(i, term) {
 						$.each(contact.ldapAttributes, function(attribute, attributeValue) {
 							if (attributeValue.toLowerCase().includes(term)) {
@@ -219,10 +220,13 @@ export default {
 							}
 						})
 					})
-					if (hits >= searchTerms.length) self.visibleContactsList[ contact.uuid ] = contact
+					if (hits >= searchTerms.length) self.visibleContactsList[contact.uuid] = contact
 				})
 			}
-		}
-	}
+		},
+		ldapAttributeUpdated(name, value) {
+			this.activeContact.ldapAttributes[name] = value
+		},
+	},
 }
 </script>

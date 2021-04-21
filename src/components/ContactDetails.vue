@@ -8,7 +8,7 @@
 					<tr v-for="attribute in settings.userLdapAttributes" :key="attribute.name">
 						<td>{{ attribute.label }}</td>
 						<td>
-							<input v-model="contactDetails.ldapAttributes[ attribute.name ]">
+							<input :value="contactDetails.ldapAttributes[ attribute.name ]" @input="$emit('attribute-updated', attribute.name, $event.target.value)">
 						</td>
 					</tr>
 				</tbody>
@@ -85,20 +85,21 @@ Axios.defaults.headers.common.requesttoken = OC.requestToken
 export default {
 	components: {
 		Actions,
-		ActionButton
+		ActionButton,
 	},
 	props: {
 		contactDetails: {
 			title: 'contactDetails',
 			type: Object,
-			default: function() { return {} }
+			default() { return {} },
 		},
 		editMode: {
 			title: 'editMode',
 			type: Number,
-			default: function() { return 0 }
-		}
+			default() { return 0 },
+		},
 	},
+	emits: ['attribute-updated'],
 	data() {
 		return {
 			loading: true,
@@ -109,12 +110,12 @@ export default {
 				copyToClipboard: t('ldapcontacts', 'Copy to clipboard'),
 				groups: t('ldapcontacts', 'Groups'),
 				errorOccured: t('ldapcontacts', 'An error occured, please try again later'),
-				save: t('ldapcontacts', 'Save')
+				save: t('ldapcontacts', 'Save'),
 			},
-			baseUrl: OC.generateUrl('/apps/ldapcontacts'),
+			baseUrl: this.generateUrl('/apps/ldapcontacts'),
 			settings: {},
 			updatingOwnContactDetails: false,
-			messageList: []
+			messageList: [],
 		}
 	},
 	computed: {},
@@ -124,7 +125,7 @@ export default {
 	},
 	methods: {
 		loadSettings() {
-			var self = this
+			const self = this
 
 			Axios.get(self.baseUrl + '/settings')
 				.then(function(response) {
@@ -141,24 +142,24 @@ export default {
 				})
 		},
 		copyToClipboard(text) {
-			var input = $(document.createElement('input'))
+			const input = $(document.createElement('input'))
 			$('body').append(input)
 			input.val(text).select()
 			document.execCommand('copy')
 			input.remove()
 		},
 		displayMessage(message, type) {
-			var self = this
-			var messageObject = {
-				message: message,
-				type: type
+			const self = this
+			const messageObject = {
+				message,
+				type,
 			}
 
 			self.messageList.push(messageObject)
 			setTimeout(function() { self.messageList.pop() }, 3000)
 		},
 		updateOwnContactDetails() {
-			var self = this
+			const self = this
 			if (self.updatingOwnContactDetails) return
 			else self.updatingOwnContactDetails = true
 
@@ -174,7 +175,7 @@ export default {
 				.finally(function() {
 					self.updatingOwnContactDetails = false
 				})
-		}
-	}
+		},
+	},
 }
 </script>

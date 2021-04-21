@@ -21,20 +21,20 @@ import $ from 'jquery'
 import Axios from 'axios'
 Axios.defaults.headers.common.requesttoken = OC.requestToken
 
-var Chart = require('./Chart.min.js')
+const Chart = require('./Chart.min.js')
 
 export default {
 	name: 'Statistics',
 	components: {},
-	data: function() {
+	data() {
 		return {
 			loading: true,
 			statistics: {},
-			baseUrl: OC.generateUrl('/apps/ldapcontacts'),
+			baseUrl: this.generateUrl('/apps/ldapcontacts'),
 			chartWrapperList: [],
 			charts: [],
 			text: {
-				total: t('ldapcontacts', 'Total:')
+				total: t('ldapcontacts', 'Total:'),
 			},
 			graphs: {
 				bgColors: [
@@ -43,7 +43,7 @@ export default {
 					'rgba(255, 206, 86, 0.2)',
 					'rgba(75, 192, 192, 0.2)',
 					'rgba(153, 102, 255, 0.2)',
-					'rgba(255, 159, 64, 0.2)'
+					'rgba(255, 159, 64, 0.2)',
 				],
 				borderColors: [
 					'rgba(54, 162, 235, 1)',
@@ -51,9 +51,9 @@ export default {
 					'rgba(255, 206, 86, 1)',
 					'rgba(75, 192, 192, 1)',
 					'rgba(153, 102, 255, 1)',
-					'rgba(255, 159, 64, 1)'
+					'rgba(255, 159, 64, 1)',
 				],
-				borderWidth: 1
+				borderWidth: 1,
 			},
 			dataLabels: {
 				entries: t('ldapcontacts', 'Entries'),
@@ -65,12 +65,12 @@ export default {
 				users_filled_entries: t('ldapcontacts', 'Users with some filled entries'),
 				users_empty_entries: t('ldapcontacts', 'Users with only empty entries'),
 				users_filled_entries_percent: t('ldapcontacts', 'Users with some filled entries'),
-				users_empty_entries_percent: t('ldapcontacts', 'Users with only empty entries')
+				users_empty_entries_percent: t('ldapcontacts', 'Users with only empty entries'),
 			},
 			statTitles: {
 				entries: t('ldapcontacts', 'Entries filled'),
-				user_entries: t('ldapcontacts', 'Users with filled entries')
-			}
+				user_entries: t('ldapcontacts', 'Users with filled entries'),
+			},
 		}
 	},
 	computed: {},
@@ -79,7 +79,7 @@ export default {
 	},
 	methods: {
 		loadStatistics() {
-			var self = this
+			const self = this
 
 			Axios.get(self.baseUrl + '/statistics')
 				.finally(function() {
@@ -96,56 +96,56 @@ export default {
 			this.renderEntriesStat()
 			this.renderUsersEntriesStat()
 		},
-		renderEntriesStat: function() {
-			this.renderBarGraph('entries', 'entries_stat', [ 'entries_filled', 'entries_empty' ], this.statistics[ 'entries' ])
+		renderEntriesStat() {
+			this.renderBarGraph('entries', 'entries_stat', ['entries_filled', 'entries_empty'], this.statistics.entries)
 		},
-		renderUsersEntriesStat: function() {
-			this.renderBarGraph('user_entries', 'users_entries_stat', [ 'users_filled_entries', 'users_empty_entries' ], this.statistics[ 'users' ])
+		renderUsersEntriesStat() {
+			this.renderBarGraph('user_entries', 'users_entries_stat', ['users_filled_entries', 'users_empty_entries'], this.statistics.users)
 		},
-		renderBarGraph: function(title, id, dataKeys, total) {
-			var self = this
-			var canvasId = 'ldapcontacts_statistics_' + id
-			title = self.statTitles[ title ]
+		renderBarGraph(title, id, dataKeys, total) {
+			const self = this
+			const canvasId = 'ldapcontacts_statistics_' + id
+			title = self.statTitles[title]
 
 			self.chartWrapperList.push({
 				id: canvasId,
-				title: title,
-				total: total
+				title,
+				total,
 			})
 
 			// get all data values
-			var data = []
+			const data = []
 			$.each(dataKeys, function(k, key) {
-				data.push(self.statistics[ key ])
+				data.push(self.statistics[key])
 			})
 			// get all data labels
-			var labels = []
+			const labels = []
 			$.each(dataKeys, function(k, key) {
-				labels.push(self.dataLabels[ key ])
+				labels.push(self.dataLabels[key])
 			})
 
 			self.$nextTick(function() {
-				var ctx = document.getElementById(canvasId).getContext('2d')
+				const ctx = document.getElementById(canvasId).getContext('2d')
 
 				self.charts.push(new Chart(ctx, {
 					type: 'pie',
 					data: {
 						datasets: [
 							{
-								data: data,
+								data,
 								backgroundColor: self.graphs.bgColors,
 								borderColor: self.graphs.borderColors,
-								borderWidth: self.graphs.borderWidth
-							}
+								borderWidth: self.graphs.borderWidth,
+							},
 						],
-						labels: labels
+						labels,
 					},
 					options: {
 
-					}
+					},
 				}))
 			})
-		}
-	}
+		},
+	},
 }
 </script>

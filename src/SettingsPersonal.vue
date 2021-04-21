@@ -33,17 +33,17 @@ Axios.defaults.headers.common.requesttoken = OC.requestToken
 export default {
 	name: 'SettingsPersonal',
 	components: {},
-	data: function() {
+	data() {
 		return {
 			loading: true,
 			text: {
 				contacts: t('ldapcontacts', 'Contacts'),
-				orderContactsBy: t('ldapcontacts', 'Order Contacts by:')
+				orderContactsBy: t('ldapcontacts', 'Order Contacts by:'),
 			},
-			baseUrl: OC.generateUrl('/apps/ldapcontacts'),
+			baseUrl: this.generateUrl('/apps/ldapcontacts'),
 			orderBy: '',
 			userLdapAttributes: {},
-			messageList: []
+			messageList: [],
 		}
 	},
 	beforeMount() {
@@ -52,7 +52,7 @@ export default {
 	},
 	methods: {
 		loadSettings() {
-			var self = this
+			const self = this
 
 			Axios.get(self.baseUrl + '/settings')
 				.then(function(response) {
@@ -69,7 +69,7 @@ export default {
 				})
 		},
 		loadSettingsPersonal() {
-			var self = this
+			const self = this
 
 			Axios.get(self.baseUrl + '/settings/personal/order_by')
 				.then(function(response) {
@@ -87,11 +87,11 @@ export default {
 				})
 		},
 		saveSettingsPersonal(key, value) {
-			var self = this
+			const self = this
 
-			var data = {
-				key: key,
-				value: value
+			const data = {
+				key,
+				value,
 			}
 
 			Axios.post(self.baseUrl + '/settings/personal', data)
@@ -110,15 +110,15 @@ export default {
 				})
 		},
 		displayMessage(message, type) {
-			var self = this
-			var messageObject = {
-				message: message,
-				type: type
+			const self = this
+			const messageObject = {
+				message,
+				type,
 			}
 
 			self.messageList.push(messageObject)
 			setTimeout(function() { self.messageList.pop() }, 3000)
-		}
-	}
+		},
+	},
 }
 </script>

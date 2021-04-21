@@ -121,14 +121,14 @@ Axios.defaults.headers.common.requesttoken = OC.requestToken
 export default {
 	name: 'Settings',
 	components: {
-		ActionButton
+		ActionButton,
 	},
-	data: function() {
+	data() {
 		return {
 			loading: true,
 			loadingFunctionsDone: 0,
 			savingLdapAttributes: false,
-			baseUrl: OC.generateUrl('/apps/ldapcontacts'),
+			baseUrl: this.generateUrl('/apps/ldapcontacts'),
 			text: {
 				ldapContacts: t('ldapcontacts', 'LDAP Contacts'),
 				userLdapAttributes: t('ldapcontacts', 'Define LDAP attributes the users can see and edit'),
@@ -143,10 +143,10 @@ export default {
 				noUsersHidden: t('ldapcontacts', 'No users are hidden'),
 				noGroupsHidden: t('ldapcontacts', 'No groups are hidden'),
 				errorOccured: t('ldapcontacts', 'An error occured, please try again later'),
-				saveAttributes: t('ldapcontacts', 'Save Attributes')
+				saveAttributes: t('ldapcontacts', 'Save Attributes'),
 			},
 			settings: {
-				userLdapAttributes: {}
+				userLdapAttributes: {},
 			},
 			hiddenUserSearchInput: '',
 			hiddenGroupSearchInput: '',
@@ -156,7 +156,7 @@ export default {
 			hiddenUsersList: {},
 			visibleGroupsList: {},
 			hiddenGroupsList: {},
-			messageList: []
+			messageList: [],
 		}
 	},
 	computed: {},
@@ -185,9 +185,9 @@ export default {
 			}
 		},
 		addAttribute() {
-			var newAttribute = {
+			const newAttribute = {
 				name: '',
-				label: ''
+				label: '',
 			}
 			this.$set(this.settings.userLdapAttributes, this.getHighestIndex(this.settings.userLdapAttributes) + 1, newAttribute)
 		},
@@ -208,7 +208,7 @@ export default {
 			this.hideEntity('group', groupId)
 		},
 		hideEntity(type, id) {
-			var self = this
+			const self = this
 
 			Axios.get(self.baseUrl + '/admin/hide/' + type + '/' + id)
 				.then(function(response) {
@@ -231,7 +231,7 @@ export default {
 			this.unhideEntity('group', groupId)
 		},
 		unhideEntity(type, uuid) {
-			var self = this
+			const self = this
 			Axios.get(self.baseUrl + '/admin/show/' + type + '/' + uuid)
 				.then(function(response) {
 					if (response.data.status === 'success') {
@@ -253,10 +253,10 @@ export default {
 			this.search('group')
 		},
 		search(type) {
-			var self = this
-			var searchTerms = []
-			var searchList = {}
-			var searchResults = {}
+			const self = this
+			let searchTerms = []
+			let searchList = {}
+			const searchResults = {}
 
 			switch (type) {
 			case 'user':
@@ -274,14 +274,14 @@ export default {
 			}
 
 			// filter out empty search terms
-			var temp = []
-			for (let term of searchTerms) term && temp.push(term.toLowerCase())
+			const temp = []
+			for (const term of searchTerms) term && temp.push(term.toLowerCase())
 			searchTerms = temp
 
 			// perform the search
 			if (searchTerms.length > 0) {
 				$.each(searchList, function(i, item) {
-					var hits = 0
+					let hits = 0
 					$.each(searchTerms, function(i, term) {
 						switch (type) {
 						case 'user':
@@ -297,7 +297,7 @@ export default {
 							break
 						}
 					})
-					if (hits >= searchTerms.length) searchResults[ item.uuid ] = item
+					if (hits >= searchTerms.length) searchResults[item.uuid] = item
 				})
 			}
 
@@ -320,13 +320,13 @@ export default {
 			this.search(type)
 		},
 		loadSettings() {
-			var self = this
+			const self = this
 
 			return Axios.get(self.baseUrl + '/settings')
 				.then(function(response) {
 					if (response.data.status === 'success') {
 						$.each(response.data.data, function(settingKey, settingValue) {
-							self.settings[ settingKey ] = settingValue
+							self.settings[settingKey] = settingValue
 						})
 						// have at least one user attribute visible
 						if (self.objectIsEmpty(self.settings.userLdapAttributes)) self.addAttribute()
@@ -341,7 +341,7 @@ export default {
 				})
 		},
 		loadUsers() {
-			var self = this
+			const self = this
 
 			return Axios.get(self.baseUrl + '/load')
 				.then(function(response) {
@@ -358,7 +358,7 @@ export default {
 				})
 		},
 		loadHiddenUsers() {
-			var self = this
+			const self = this
 
 			return Axios.get(self.baseUrl + '/load/hidden')
 				.then(function(response) {
@@ -375,7 +375,7 @@ export default {
 				})
 		},
 		loadGroups() {
-			var self = this
+			const self = this
 
 			return Axios.get(self.baseUrl + '/groups')
 				.then(function(response) {
@@ -392,7 +392,7 @@ export default {
 				})
 		},
 		loadHiddenGroups() {
-			var self = this
+			const self = this
 
 			return Axios.get(self.baseUrl + '/groups/hidden')
 				.then(function(response) {
@@ -409,7 +409,7 @@ export default {
 				})
 		},
 		saveLdapAttributes() {
-			var self = this
+			const self = this
 			if (self.savingLdapAttributes) return
 			else self.savingLdapAttributes = true
 
@@ -425,15 +425,15 @@ export default {
 				})
 		},
 		displayMessage(message, type) {
-			var self = this
-			var messageObject = {
-				message: message,
-				type: type
+			const self = this
+			const messageObject = {
+				message,
+				type,
 			}
 
 			self.messageList.push(messageObject)
 			setTimeout(function() { self.messageList.pop() }, 3000)
-		}
-	}
+		},
+	},
 }
 </script>

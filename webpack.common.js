@@ -43,10 +43,10 @@ module.exports = {
 	plugins: [
 		new VueLoaderPlugin(),
 		new StyleLintPlugin(),
-		/*new ESLintPlugin({
+		new ESLintPlugin({
 			 extensions: ['js', 'vue'],
-			 exclude: [ 'node_modules', '\.min\.js$' ],
-		})*/
+			 exclude: [ 'node_modules', 'src/*.min.js' ],
+		})
 	],
 	resolve: {
 		extensions: ['*', '.js', '.vue']
