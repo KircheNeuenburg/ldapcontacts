@@ -122,6 +122,7 @@
 		.search-suggestion-container {
 			position: absolute;
 			border-top: 1px solid var(--color-box-shadow);
+			margin-top: -3px;
 
 			.suggestion {
 				transition: background-color 0.3s;
@@ -143,10 +144,11 @@
 	.hidden-entity {
 		display: inline-block;
 		margin: 5px;
+		background-color: rgba(240, 240, 240, 0.9);
+		line-height: 18px;
 	}
 
 	.hidden-entity > * {
-		background-color: rgba(240, 240, 240, 0.9);
 		display: inline-block;
 		height: 23px;
 		padding: 1px 7px 0;
@@ -154,8 +156,6 @@
 
 	.hidden-entity > .name {
 		display: inline-block;
-		border-right: 1px solid grey;
-		border-radius: 5px 0 0 5px;
 	}
 
 	.hidden-entity > .remove {

@@ -19,20 +19,22 @@
 						<td><input v-model="attribute.name" :placeholder="text.ldapAttribute"></td>
 						<td><input v-model="attribute.label" :placeholder="text.label"></td>
 						<td>
-							<ul class="no-list-style">
-								<ActionButton icon="icon-delete" @click="removeAttribute(index)" />
-							</ul>
+							<Actions>
+								<ActionButton icon="icon-delete" @click="removeAttribute(index)">
+									{{ text.delete }}
+								</ActionButton>
+							</Actions>
 						</td>
 					</tr>
 				</tbody>
 				<tfoot>
 					<tr>
-						<td colspan="2">
-							<ul class="no-list-style standalone">
+						<td>
+							<Actions>
 								<ActionButton icon="icon-add" @click="addAttribute">
 									{{ text.addAttribute }}
 								</ActionButton>
-							</ul>
+							</Actions>
 						</td>
 						<td class="save-button-wrapper">
 							<button @click="saveLdapAttributes">
@@ -40,6 +42,7 @@
 							</button>
 							<i v-if="savingLdapAttributes" class="icon-loading" />
 						</td>
+						<td />
 					</tr>
 				</tfoot>
 			</table>
@@ -113,6 +116,7 @@
 </template>
 
 <script>
+import Actions from '@nextcloud/vue/dist/Components/Actions'
 import ActionButton from '@nextcloud/vue/dist/Components/ActionButton'
 import $ from 'jquery'
 import Axios from 'axios'
@@ -122,6 +126,7 @@ export default {
 	name: 'Settings',
 	components: {
 		ActionButton,
+		Actions,
 	},
 	data() {
 		return {
@@ -144,6 +149,7 @@ export default {
 				noGroupsHidden: t('ldapcontacts', 'No groups are hidden'),
 				errorOccured: t('ldapcontacts', 'An error occured, please try again later'),
 				saveAttributes: t('ldapcontacts', 'Save Attributes'),
+				delete: t('ldapcontacts', 'Delete'),
 			},
 			settings: {
 				userLdapAttributes: {},
