@@ -25,12 +25,12 @@
 /* end of messages */
 
 /* content */
-#content {
-	width: 100%;
+#content-vue {
+	padding-top: 0;
 }
 
-#app-content {
-	padding: 0 30px 30px;
+#app-content-vue {
+	padding: 30px;
 }
 
 .no-list-style {
@@ -86,7 +86,7 @@ table tr td:first-child {
 	}
 }
 
-#app-navigation > .icon-loading {
+#app-navigation-vue > .icon-loading {
 	min-height: 50px;
 }
 /* end of navigation */

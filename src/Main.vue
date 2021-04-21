@@ -27,23 +27,29 @@
 				</div>
 			</div>
 
-			<div v-if="loading" class="icon-loading" />
-			<ul v-else>
-				<AppNavigationItem v-for="contact in visibleContactsList"
+			<template #list>
+				<li v-if="loading">
+					<div class="icon-loading" />
+				</li>
+				<AppNavigationItem
+					v-for="contact in visibleContactsList"
+					v-else
 					:key="contact.uuid"
 					:item="contact"
 					:title="contact.title"
 					:icon="contact.avatar"
 					:class="{'active': contact.uuid === activeContact.uuid}"
 					@click="showContactDetails(contact)" />
-			</ul>
+			</template>
 
-			<AppNavigationSettings>
-				<div v-if="loadingOwnContact" class="icon-loading" />
-				<button v-else class="has-input-icon-wrapper" @click="editOwnData">
-					{{ text.editOwnContactDetails }}
-				</button>
-			</AppNavigationSettings>
+			<template #footer>
+				<AppNavigationSettings>
+					<div v-if="loadingOwnContact" class="icon-loading" />
+					<button v-else class="has-input-icon-wrapper" @click="editOwnData">
+						{{ text.editOwnContactDetails }}
+					</button>
+				</AppNavigationSettings>
+			</template>
 		</AppNavigation>
 		<AppContent>
 			<div v-if="loading" class="icon-loading" />
