@@ -9,7 +9,7 @@ sign_dir=$(build_dir)/sign
 docker_sign_dir=$(docker_build_dir)/sign
 package_name=$(app_name)
 cert_dir=$(HOME)/.nextcloud/certificates
-version=2.0.4
+version=2.0.5
 
 
 all: dev-setup lint build-js-production test
