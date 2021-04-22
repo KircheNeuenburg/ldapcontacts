@@ -9,19 +9,15 @@ use OCP\IL10n;
 class Settings implements IRepairStep {
   /** @var string */
   protected $appName;
-  /** @var IL10n */
-  protected $l;
   /** @var IConfig */
   protected $config;
 
   /**
    * @param string $AppName
-   * @param IL10N $l10n
    * @param IConfig $config
    */
-  public function __construct($AppName, IL10N $l10n, IConfig $config) {
+  public function __construct($AppName, IConfig $config) {
     $this->appName = $AppName;
-    $this->l = $l10n;
     $this->config = $config;
   }
 
@@ -29,7 +25,7 @@ class Settings implements IRepairStep {
    * Returns the step's name
    */
   public function getName() {
-    return $this->l->t( 'Settings restructuring' );
+    return 'Settings restructuring';
   }
 
   /**

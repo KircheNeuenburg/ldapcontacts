@@ -46,7 +46,6 @@ OC.L10N.register(
   "Edit own contact details" : "Eigene Kontaktdaten bearbeiten",
   "Search Users" : "Benutzer Durchsuchen",
   "An error occured, please try again later" : "Es ist ein Fehler aufgetreten, versuchen Sie es später noch einmal",
-  "Settings restructuring" : "Einstellungen umstrukturieren",
   "Unknown entity type" : "Ungekannter Objekt Typ",
   "Entity not found" : "Object nicht gefunden",
   "Group is now visible again" : "Die Gruppe ist jetzt wieder sichtbar",
