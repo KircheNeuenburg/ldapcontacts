@@ -1,7 +1,7 @@
 {
 	"name": "ldapcontacts",
 	"description": "Display your LDAP contacts",
-	"version": "2.0.3",
+	"version": "2.0.4",
 	"author": "Alexander Hornig <alexander@h-software.de>",
 	"contributors": [
 		"Alexander Hornig <alexander@h-software.de>"
