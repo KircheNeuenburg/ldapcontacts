@@ -1,18 +1,20 @@
 app_name=ldapcontacts
 
 project_dir=$(CURDIR)/../$(app_name)
+nextcloud_container=nc21-h-software-de_nextcloud
+docker_project_dir=/var/www/html/custom_apps/$(app_name)
 build_dir=$(CURDIR)/build/artifacts
-appstore_dir=$(build_dir)/appstore
-source_dir=$(build_dir)/source
+docker_build_dir=$(docker_project_dir)/build/artifacts
 sign_dir=$(build_dir)/sign
+docker_sign_dir=$(docker_build_dir)/sign
 package_name=$(app_name)
 cert_dir=$(HOME)/.nextcloud/certificates
-version=2.0.3
+version=2.0.4
 
 
 all: dev-setup lint build-js-production test
 
-release: npm-init build-js-production appstore
+release: appstore
 
 # Dev env management
 dev-setup: clean clean-dev npm-init
@@ -74,7 +76,7 @@ create-tag:
 	git push origin v$(version)
 
 check-code:
-	php ../../occ app:check-code $(app_name)
+	docker exec -it -u 33 $(nextcloud_container) php ./occ app:check-code $(app_name)
 
 appstore: npm-init build-js-production check-code
 	rm -rf $(build_dir)
@@ -93,16 +95,19 @@ appstore: npm-init build-js-production check-code
 	--exclude=webpack.common.js \
 	--exclude=webpack.dev.js \
 	--exclude=webpack.prod.js \
-	--exclude=js/**.js.map \
+	--exclude=js/**.js.* \
 	--exclude=README.md \
 	--exclude=src \
 	$(project_dir)/  $(sign_dir)/$(app_name)
 	@if [ -f $(cert_dir)/$(app_name).key ]; then \
 		echo "Signing app files…"; \
-		php ../../occ integrity:sign-app \
-			--privateKey=$(cert_dir)/$(app_name).key\
-			--certificate=$(cert_dir)/$(app_name).crt\
-			--path=$(sign_dir)/$(app_name); \
+		mkdir -p certs; \
+		cp -r $(cert_dir)/$(app_name).* certs; \
+		docker exec -it -u 33 $(nextcloud_container) php ./occ integrity:sign-app \
+			--privateKey=$(docker_project_dir)/certs/$(app_name).key\
+			--certificate=$(docker_project_dir)/certs/$(app_name).crt\
+			--path=$(docker_sign_dir)/$(app_name); \
+		rm -r certs; \
 	fi
 	tar -czf $(build_dir)/$(app_name)-$(version).tar.gz \
 		-C $(sign_dir) $(app_name)
