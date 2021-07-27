@@ -3,3 +3,4 @@ node_modules
 js/ldapcontacts_*.js
 js/ldapcontacts_*.js.*
 core
+.DS_Store
