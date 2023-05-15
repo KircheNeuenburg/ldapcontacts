@@ -40,11 +40,11 @@
 							</p>
 						</td>
 						<td>
-							<Actions>
-								<ActionButton icon="icon-clippy" @click="copyToClipboard(contactDetails.ldapAttributes[ attribute.name ])">
+							<NcActions>
+								<NcActionButton icon="icon-clippy" @click="copyToClipboard(contactDetails.ldapAttributes[ attribute.name ])">
 									{{ text.copyToClipboard }}
-								</ActionButton>
-							</Actions>
+								</NcActionButton>
+							</NcActions>
 						</td>
 					</tr>
 
@@ -76,16 +76,16 @@
 </template>
 
 <script>
-import Actions from '@nextcloud/vue/dist/Components/Actions'
-import ActionButton from '@nextcloud/vue/dist/Components/ActionButton'
+import NcActions from '@nextcloud/vue/dist/Components/NcActions'
+import NcActionButton from '@nextcloud/vue/dist/Components/NcActionButton'
 import $ from 'jquery'
 import Axios from 'axios'
 Axios.defaults.headers.common.requesttoken = OC.requestToken
 
 export default {
 	components: {
-		Actions,
-		ActionButton,
+		NcActions,
+		NcActionButton,
 	},
 	props: {
 		contactDetails: {

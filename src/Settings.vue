@@ -19,22 +19,22 @@
 						<td><input v-model="attribute.name" :placeholder="text.ldapAttribute"></td>
 						<td><input v-model="attribute.label" :placeholder="text.label"></td>
 						<td>
-							<Actions>
-								<ActionButton icon="icon-delete" @click="removeAttribute(index)">
+							<NcActions>
+								<NcActionButton icon="icon-delete" @click="removeAttribute(index)">
 									{{ text.delete }}
-								</ActionButton>
-							</Actions>
+								</NcActionButton>
+							</NcActions>
 						</td>
 					</tr>
 				</tbody>
 				<tfoot>
 					<tr>
 						<td>
-							<Actions>
-								<ActionButton icon="icon-add" @click="addAttribute">
+							<NcActions>
+								<NcActionButton icon="icon-add" @click="addAttribute">
 									{{ text.addAttribute }}
-								</ActionButton>
-							</Actions>
+								</NcActionButton>
+							</NcActions>
 						</td>
 						<td class="save-button-wrapper">
 							<button @click="saveLdapAttributes">
@@ -116,8 +116,8 @@
 </template>
 
 <script>
-import Actions from '@nextcloud/vue/dist/Components/Actions'
-import ActionButton from '@nextcloud/vue/dist/Components/ActionButton'
+import NcActions from '@nextcloud/vue/dist/Components/NcActions'
+import NcActionButton from '@nextcloud/vue/dist/Components/NcActionButton'
 import $ from 'jquery'
 import Axios from 'axios'
 Axios.defaults.headers.common.requesttoken = OC.requestToken
@@ -125,8 +125,8 @@ Axios.defaults.headers.common.requesttoken = OC.requestToken
 export default {
 	name: 'Settings',
 	components: {
-		ActionButton,
-		Actions,
+		NcActionButton,
+		NcActions,
 	},
 	data() {
 		return {
