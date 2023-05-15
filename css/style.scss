@@ -53,31 +53,8 @@ table tr td:first-child {
 
 	.search-container {
 		position: relative;
-
-		input {
-			width: calc(100% - 24px);
-			margin: 14px 12px;
-			padding: 5px 25px;
-			background: transparent url('../img/search.svg?v=1') no-repeat 5px center;
-		}
-
-		.abort {
-			opacity: 0.5;
-			transition: opacity 0.5s;
-			background: transparent var(--icon-close-000) no-repeat center;
-			background-size: auto;
-			background-size: 100%;
-			width: 20px;
-			height: 20px;
-			position: absolute;
-			right: 16px;
-			top: 20px;
-			cursor: pointer;
-		}
-
-		.abort:focus, .abort:hover, .abort:active {
-			opacity: 0.8;
-		}
+		width: calc(100% - 24px);
+		margin: 12px 12px 5px 12px;
 	}
 
 	.select-group {

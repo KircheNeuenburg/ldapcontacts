@@ -19,22 +19,22 @@
 						<td><input v-model="attribute.name" :placeholder="text.ldapAttribute"></td>
 						<td><input v-model="attribute.label" :placeholder="text.label"></td>
 						<td>
-							<Actions>
-								<ActionButton icon="icon-delete" @click="removeAttribute(index)">
+							<NcActions>
+								<NcActionButton icon="icon-delete" @click="removeAttribute(index)">
 									{{ text.delete }}
-								</ActionButton>
-							</Actions>
+								</NcActionButton>
+							</NcActions>
 						</td>
 					</tr>
 				</tbody>
 				<tfoot>
 					<tr>
 						<td>
-							<Actions>
-								<ActionButton icon="icon-add" @click="addAttribute">
+							<NcActions>
+								<NcActionButton icon="icon-add" @click="addAttribute">
 									{{ text.addAttribute }}
-								</ActionButton>
-							</Actions>
+								</NcActionButton>
+							</NcActions>
 						</td>
 						<td class="save-button-wrapper">
 							<button @click="saveLdapAttributes">
@@ -60,11 +60,14 @@
 				<h3>{{ text.hidden_users }}</h3>
 				<div class="search-container">
 					<span class="search">
-						<input v-model="hiddenUserSearchInput"
-							:placeholder="text.hideUser"
-							type="search"
-							@keyup="searchVisibleUsers">
-						<span class="abort" @click="abortSearch('group')" />
+						<NcTextField :value.sync="hiddenUserSearchInput"
+							:placeholder="text.searchUsers"
+							trailing-button-icon="close"
+							:show-trailing-button="hiddenUserSearchInput !== ''"
+							@keyup="searchVisibleUsers"
+							@trailing-button-click="abortSearch('user')">
+							<Magnify />
+						</NcTextField>
 					</span>
 					<div class="search-suggestion-container">
 						<div v-for="user in hideUserSearchSuggestions"
@@ -87,13 +90,14 @@
 			<div id="hideGroups" class="container">
 				<h3>{{ text.hidden_groups }}</h3>
 				<div class="search-container">
-					<span class="search">
-						<input v-model="hiddenGroupSearchInput"
-							:placeholder="text.hideGroup"
-							type="search"
-							@keyup="searchVisibleGroups">
-						<span class="abort" @click="abortSearch('user')" />
-					</span>
+					<NcTextField :value.sync="hiddenGroupSearchInput"
+						:placeholder="text.searchUsers"
+						trailing-button-icon="close"
+						:show-trailing-button="hiddenGroupSearchInput !== ''"
+						@keyup="searchVisibleGroups"
+						@trailing-button-click="abortSearch('group')">
+						<Magnify />
+					</NcTextField>
 					<div class="search-suggestion-container">
 						<div v-for="group in hideGroupSearchSuggestions"
 							:key="group.uuid"
@@ -116,8 +120,10 @@
 </template>
 
 <script>
-import Actions from '@nextcloud/vue/dist/Components/Actions'
-import ActionButton from '@nextcloud/vue/dist/Components/ActionButton'
+import NcActions from '@nextcloud/vue/dist/Components/NcActions'
+import NcActionButton from '@nextcloud/vue/dist/Components/NcActionButton'
+import NcTextField from '@nextcloud/vue/dist/Components/NcTextField'
+import Magnify from 'vue-material-design-icons/Magnify'
 import $ from 'jquery'
 import Axios from 'axios'
 Axios.defaults.headers.common.requesttoken = OC.requestToken
@@ -125,8 +131,10 @@ Axios.defaults.headers.common.requesttoken = OC.requestToken
 export default {
 	name: 'Settings',
 	components: {
-		ActionButton,
-		Actions,
+		NcActionButton,
+		NcActions,
+		NcTextField,
+		Magnify,
 	},
 	data() {
 		return {

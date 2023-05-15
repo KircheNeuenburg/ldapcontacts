@@ -14,14 +14,14 @@ class PersonalSection implements IIconSection {
 	protected $appName;
 
 	/**
-	 * @param string $AppName
+	 * @param string $appName
 	 * @param IL10N $l10n
 	 * @param IURLGenerator $urlGenerator
 	 */
-	public function __construct($AppName, IL10N $l10n, IURLGenerator $urlGenerator) {
+	public function __construct($appName, IL10N $l10n, IURLGenerator $urlGenerator) {
 		$this->l10n = $l10n;
 		$this->urlGenerator = $urlGenerator;
-		$this->appName = $AppName;
+		$this->appName = $appName;
 	}
 
 	/**

@@ -37,7 +37,7 @@ export default {
 		return {
 			loading: true,
 			text: {
-				contacts: t('ldapcontacts', 'Contacts'),
+				contacts: t('ldapcontacts', 'LDAP Contacts'),
 				orderContactsBy: t('ldapcontacts', 'Order Contacts by:'),
 			},
 			baseUrl: this.generateUrl('/apps/ldapcontacts'),

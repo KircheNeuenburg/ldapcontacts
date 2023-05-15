@@ -101,13 +101,13 @@ class LdapUser extends LdapEntity {
    * check if this user is hidden and save the result
    */
   protected function updateIsHiddenAttribute() {
-    $hiddenUserIdList = $this->settings->getSetting('hiddenUsers', false);
-    if ($hiddenUserIdList === false) {
+    $hiddenuserIdList = $this->settings->getSetting('hiddenUsers', false);
+    if ($hiddenuserIdList === false) {
       // no users were hidden yet
       $this->hidden = false;
       return;
     }
-    $this->hidden = in_array($this->uuid, $hiddenUserIdList);
+    $this->hidden = in_array($this->uuid, $hiddenuserIdList);
   }
 
   /**

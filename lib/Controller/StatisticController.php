@@ -11,11 +11,11 @@ class StatisticController extends Controller {
   // all available statistics
   protected $statistics = [ 'entries', 'entries_filled', 'entries_empty', 'entries_filled_percent', 'entries_empty_percent', 'users', 'users_filled_entries', 'users_empty_entries', 'users_filled_entries_percent', 'users_empty_entries_percent' ];
 
-  public function __construct($AppName,
+  public function __construct($appName,
                               IRequest $request,
                               ContactController $contacts,
                               SettingsController $settings) {
-    parent::__construct( $AppName, $request );
+    parent::__construct( $appName, $request );
     $this->contacts = $contacts;
     $this->settings = $settings;
   }

@@ -1,16 +1,19 @@
 <template>
-	<Content :class="{'icon-loading': loading}" app-name="ldapcontacts">
-		<AppNavigation>
+	<NcContent :class="{'icon-loading': loading}" app-name="ldapcontacts">
+		<NcAppNavigation>
 			<div id="navigation-header">
 				<div v-if="groupsLoading || loading" class="loading" />
 
 				<div v-else>
 					<div class="search-container">
-						<input v-model="contactSearchInput"
+						<NcTextField :value.sync="contactSearchInput"
 							:placeholder="text.searchUsers"
-							type="search"
-							@keyup="updateSearch">
-						<span v-if="contactSearchInput" class="abort" @click="abortSearch" />
+							trailing-button-icon="close"
+							:show-trailing-button="contactSearchInput !== ''"
+							@keyup="updateSearch"
+							@trailing-button-click="abortSearch">
+							<SearchIcon />
+						</NcTextField>
 					</div>
 
 					<select v-model="selectedGroupId" class="select-group" @change="updateSearch">
@@ -31,7 +34,7 @@
 				<li v-if="loading">
 					<div class="icon-loading" />
 				</li>
-				<AppNavigationItem
+				<NcAppNavigationItem
 					v-for="contact in visibleContactsList"
 					v-else
 					:key="contact.uuid"
@@ -43,15 +46,15 @@
 			</template>
 
 			<template #footer>
-				<AppNavigationSettings>
+				<NcAppNavigationSettings>
 					<div v-if="loadingOwnContact" class="icon-loading" />
 					<button v-else class="has-input-icon-wrapper" @click="editOwnData">
 						{{ text.editOwnContactDetails }}
 					</button>
-				</AppNavigationSettings>
+				</NcAppNavigationSettings>
 			</template>
-		</AppNavigation>
-		<AppContent>
+		</NcAppNavigation>
+		<NcAppContent>
 			<div v-if="loading" class="icon-loading" />
 			<ContactDetails v-else
 				v-bind="{
@@ -59,17 +62,19 @@
 					editMode: editActiveContact
 				}"
 				@attribute-updated="ldapAttributeUpdated" />
-		</AppContent>
-	</Content>
+		</NcAppContent>
+	</NcContent>
 </template>
 
 <script>
 import ContactDetails from './components/ContactDetails'
-import Content from '@nextcloud/vue/dist/Components/Content'
-import AppContent from '@nextcloud/vue/dist/Components/AppContent'
-import AppNavigation from '@nextcloud/vue/dist/Components/AppNavigation'
-import AppNavigationItem from '@nextcloud/vue/dist/Components/AppNavigationItem'
-import AppNavigationSettings from '@nextcloud/vue/dist/Components/AppNavigationSettings'
+import NcContent from '@nextcloud/vue/dist/Components/NcContent'
+import NcAppContent from '@nextcloud/vue/dist/Components/NcAppContent'
+import NcAppNavigation from '@nextcloud/vue/dist/Components/NcAppNavigation'
+import NcAppNavigationItem from '@nextcloud/vue/dist/Components/NcAppNavigationItem'
+import NcAppNavigationSettings from '@nextcloud/vue/dist/Components/NcAppNavigationSettings'
+import NcTextField from '@nextcloud/vue/dist/Components/NcTextField'
+import SearchIcon from 'vue-material-design-icons/AccountSearchOutline.vue'
 import $ from 'jquery'
 import Axios from 'axios'
 Axios.defaults.headers.common.requesttoken = OC.requestToken
@@ -77,12 +82,14 @@ Axios.defaults.headers.common.requesttoken = OC.requestToken
 export default {
 	name: 'Main',
 	components: {
-		Content,
-		AppContent,
-		AppNavigation,
-		AppNavigationItem,
-		AppNavigationSettings,
+		NcContent,
+		NcAppContent,
+		NcAppNavigation,
+		NcAppNavigationItem,
+		NcAppNavigationSettings,
+		NcTextField,
 		ContactDetails,
+		SearchIcon,
 	},
 	data() {
 		return {
