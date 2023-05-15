@@ -60,11 +60,14 @@
 				<h3>{{ text.hidden_users }}</h3>
 				<div class="search-container">
 					<span class="search">
-						<input v-model="hiddenUserSearchInput"
-							:placeholder="text.hideUser"
-							type="search"
-							@keyup="searchVisibleUsers">
-						<span class="abort" @click="abortSearch('group')" />
+						<NcTextField :value.sync="hiddenUserSearchInput"
+							:placeholder="text.searchUsers"
+							trailing-button-icon="close"
+							:show-trailing-button="hiddenUserSearchInput !== ''"
+							@keyup="searchVisibleUsers"
+							@trailing-button-click="abortSearch('group')">
+							<Magnify />
+						</NcTextField>
 					</span>
 					<div class="search-suggestion-container">
 						<div v-for="user in hideUserSearchSuggestions"
@@ -87,13 +90,14 @@
 			<div id="hideGroups" class="container">
 				<h3>{{ text.hidden_groups }}</h3>
 				<div class="search-container">
-					<span class="search">
-						<input v-model="hiddenGroupSearchInput"
-							:placeholder="text.hideGroup"
-							type="search"
-							@keyup="searchVisibleGroups">
-						<span class="abort" @click="abortSearch('user')" />
-					</span>
+					<NcTextField :value.sync="hiddenGroupSearchInput"
+						:placeholder="text.searchUsers"
+						trailing-button-icon="close"
+						:show-trailing-button="hiddenGroupSearchInput !== ''"
+						@keyup="searchVisibleGroups"
+						@trailing-button-click="abortSearch('user')">
+						<Magnify />
+					</NcTextField>
 					<div class="search-suggestion-container">
 						<div v-for="group in hideGroupSearchSuggestions"
 							:key="group.uuid"
@@ -118,6 +122,8 @@
 <script>
 import NcActions from '@nextcloud/vue/dist/Components/NcActions'
 import NcActionButton from '@nextcloud/vue/dist/Components/NcActionButton'
+import NcTextField from '@nextcloud/vue/dist/Components/NcTextField'
+import Magnify from 'vue-material-design-icons/Magnify'
 import $ from 'jquery'
 import Axios from 'axios'
 Axios.defaults.headers.common.requesttoken = OC.requestToken
@@ -127,6 +133,8 @@ export default {
 	components: {
 		NcActionButton,
 		NcActions,
+		NcTextField,
+		Magnify,
 	},
 	data() {
 		return {
