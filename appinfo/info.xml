@@ -17,7 +17,7 @@ View other LDAP users as contacts in Nextcloud and see the personal data they sh
   * active LDAP authentification (check [Nextcloud admin manual](https://docs.nextcloud.com/server/latest/admin_manual/configuration_user/user_auth_ldap.html) for details)
   * php 7.0]]>
   </description>
-  <version>2.0.5</version>
+  <version>2.0.6</version>
   <licence>agpl</licence>
   <author mail="alexander@h-software.de" homepage="https://h-software.de">Alexander Hornig</author>
   <namespace>LdapContacts</namespace>
