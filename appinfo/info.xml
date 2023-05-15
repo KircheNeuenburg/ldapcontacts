@@ -28,8 +28,8 @@ View other LDAP users as contacts in Nextcloud and see the personal data they sh
   <screenshot>https://raw.githubusercontent.com/KircheNeuenburg/ldapcontacts/master/screenshots/main.jpg</screenshot>
 
   <dependencies>
-	  <php min-version="7.0"/>
-      <nextcloud min-version="20" max-version="21"/>
+	  <php min-version="7.0" max-version="8.2"/>
+    <nextcloud min-version="20" max-version="24"/>
   </dependencies>
 
   <repair-steps>
