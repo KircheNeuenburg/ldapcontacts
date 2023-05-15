@@ -28,20 +28,20 @@ class ContactController extends Controller {
 	 * @param string $appName
 	 * @param IRequest $request
 	 * @param SettingsController $settings
-	 * @param string $UserId
+	 * @param string $userId
 	 * @param IL10N $l10n
 	 * @param EntityFactory $entityFactory
 	 */
 	public function __construct(string $appName,
 															IRequest $request,
 															SettingsController $settings,
-															string $UserId,
+															string $userId,
 															IL10N $l10n,
 															EntityFactory $entityFactory) {
 		parent::__construct( $appName, $request );
 		$this->appName = $appName;
 		$this->settings = $settings;
-		$this->uid = $UserId;
+		$this->uid = $userId;
 		$this->l = $l10n;
 		$this->entityFactory = $entityFactory;
 	}

@@ -13,11 +13,11 @@ class Settings implements IRepairStep {
   protected $config;
 
   /**
-   * @param string $AppName
+   * @param string $appName
    * @param IConfig $config
    */
-  public function __construct($AppName, IConfig $config) {
-    $this->appName = $AppName;
+  public function __construct($appName, IConfig $config) {
+    $this->appName = $appName;
     $this->config = $config;
   }
 
