@@ -65,7 +65,7 @@
 							trailing-button-icon="close"
 							:show-trailing-button="hiddenUserSearchInput !== ''"
 							@keyup="searchVisibleUsers"
-							@trailing-button-click="abortSearch('group')">
+							@trailing-button-click="abortSearch('user')">
 							<Magnify />
 						</NcTextField>
 					</span>
@@ -95,7 +95,7 @@
 						trailing-button-icon="close"
 						:show-trailing-button="hiddenGroupSearchInput !== ''"
 						@keyup="searchVisibleGroups"
-						@trailing-button-click="abortSearch('user')">
+						@trailing-button-click="abortSearch('group')">
 						<Magnify />
 					</NcTextField>
 					<div class="search-suggestion-container">
