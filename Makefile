@@ -67,6 +67,7 @@ stylelint-fix:
 clean:
 	rm -f js/$(app_name)_*.js
 	rm -f js/$(app_name)_*.js.map
+	rm -f css/*.css
 
 clean-dev:
 	rm -rf node_modules
@@ -98,6 +99,7 @@ appstore: npm-init build-js-production check-code
 	--exclude=js/**.js.* \
 	--exclude=README.md \
 	--exclude=src \
+	--exclude=css/**.scss \
 	$(project_dir)/  $(sign_dir)/$(app_name)
 	@if [ -f $(cert_dir)/$(app_name).key ]; then \
 		echo "Signing app files…"; \

@@ -1,5 +1,6 @@
 module.exports = {
 	extends: 'stylelint-config-recommended-scss',
+	ignoreFiles: [ 'node_modules', 'build', '**/*.css' ],
 	rules: {
 		indentation: 'tab',
 		'selector-type-no-unknown': null,

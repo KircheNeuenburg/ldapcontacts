@@ -26,7 +26,13 @@ module.exports = {
 			},
 			{
 				test: /\.scss$/,
-				use: ['vue-style-loader', 'css-loader', 'sass-loader']
+				use: ['sass-loader'],
+				type: 'asset/resource',
+				generator: {
+					filename: '../css/[name].css'
+				},
+				exclude: /node_modules/
+				
 			},
 			{
 				test: /\.svg$/,
@@ -41,6 +47,10 @@ module.exports = {
 				test: /\.js$/,
 				loader: 'babel-loader',
 				exclude: [ /node_modules/, /\.min\.js$/ ]
+			},
+			{
+				test: /.*\/vue-material-design-icons.*\.vue$/,
+                loader: 'vue-loader'
 			}
 		]
 	},
