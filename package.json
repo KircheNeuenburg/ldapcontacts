@@ -37,7 +37,8 @@
 		"@nextcloud/vue": "^7.11.4",
 		"axios": "^0.21.1",
 		"jquery": "^3.6.0",
-		"vue": "^2.7.14"
+		"vue": "^2.7.14",
+		"vue-material-design-icons": "^5.2.0"
 	},
 	"browserslist": [
 		"extends @nextcloud/browserslist-config"

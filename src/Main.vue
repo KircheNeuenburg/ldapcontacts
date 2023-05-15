@@ -6,11 +6,14 @@
 
 				<div v-else>
 					<div class="search-container">
-						<input v-model="contactSearchInput"
+						<NcTextField :value.sync="contactSearchInput"
 							:placeholder="text.searchUsers"
-							type="search"
-							@keyup="updateSearch">
-						<span v-if="contactSearchInput" class="abort" @click="abortSearch" />
+							trailing-button-icon="close"
+							:show-trailing-button="contactSearchInput !== ''"
+							@keyup="updateSearch"
+							@trailing-button-click="abortSearch">
+							<SearchIcon />
+						</NcTextField>
 					</div>
 
 					<select v-model="selectedGroupId" class="select-group" @change="updateSearch">
@@ -71,7 +74,6 @@ import NcAppNavigation from '@nextcloud/vue/dist/Components/NcAppNavigation'
 import NcAppNavigationItem from '@nextcloud/vue/dist/Components/NcAppNavigationItem'
 import NcAppNavigationSettings from '@nextcloud/vue/dist/Components/NcAppNavigationSettings'
 import NcTextField from '@nextcloud/vue/dist/Components/NcTextField'
-// import CloseIcon from 'vue-material-design-icons/Close.vue'
 import SearchIcon from 'vue-material-design-icons/AccountSearchOutline.vue'
 import $ from 'jquery'
 import Axios from 'axios'
@@ -85,7 +87,9 @@ export default {
 		NcAppNavigation,
 		NcAppNavigationItem,
 		NcAppNavigationSettings,
+		NcTextField,
 		ContactDetails,
+		SearchIcon,
 	},
 	data() {
 		return {
