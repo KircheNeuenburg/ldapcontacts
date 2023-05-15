@@ -29,7 +29,7 @@ View other LDAP users as contacts in Nextcloud and see the personal data they sh
 
   <dependencies>
 	  <php min-version="7.0" max-version="8.2"/>
-    <nextcloud min-version="20" max-version="24"/>
+    <nextcloud min-version="25" max-version="26"/>
   </dependencies>
 
   <repair-steps>
